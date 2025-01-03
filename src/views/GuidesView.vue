@@ -79,7 +79,7 @@ const getAllGuidesBySelectedGame = () => {
     .then((response) => {
       this.allGuides = response.data
     })
-    .catch((error) => {
+    .catch(() => {
       toast.add({
         severity: 'error',
         summary: 'Error',

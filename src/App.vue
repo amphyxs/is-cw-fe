@@ -41,7 +41,7 @@ const items = ref([
   {
     label: 'Profile',
     icon: ProfileIcon,
-    link: '/profile',
+    link: '/account',
   },
   {
     label: 'Cart',

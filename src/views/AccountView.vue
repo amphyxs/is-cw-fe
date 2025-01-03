@@ -1,0 +1,377 @@
+<script setup>
+import { ref, reactive, onMounted, watchEffect } from 'vue'
+import axios from 'axios'
+import { useToast } from 'primevue/usetoast' // Assuming you are using PrimeVue for toasts
+import { useRouter } from 'vue-router'
+
+const toast = useToast()
+const router = useRouter()
+
+const currentAccount = ref({
+  login: 'test',
+  role: 'user',
+})
+const gamesCount = ref(0)
+const lastLoginDate = ref(new Date())
+const registrationDate = ref(new Date())
+const balance = ref(0)
+const moneyToAdd = ref(0)
+const priceForSellingItem = ref(0)
+const itemForSale = ref(null)
+const isAddingMoney = ref(false)
+const isDraggingInventoryItem = ref(false)
+const isSellingItem = ref(false)
+const inventoryItems = ref([
+  {
+    picture: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
+    gameName: 'text',
+    itemName: 'text',
+    rarity: 'rare',
+  },
+  {
+    picture: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
+    gameName: 'text',
+    itemName: 'text',
+    rarity: 'rare',
+  },
+  {
+    picture: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
+    gameName: 'text',
+    itemName: 'text',
+    rarity: 'rare',
+  },
+])
+const lastPlayedGames = ref([
+  {
+    picture: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
+    name: 'text',
+  },
+  {
+    picture: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
+    name: 'text',
+  },
+  {
+    picture: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
+    name: 'text',
+  },
+])
+
+const checkout = () => {
+  isAddingMoney.value = false
+
+  axios
+    .post(
+      'http://localhost:18124/user/balance-add',
+      {
+        balance: moneyToAdd.value,
+      },
+      {
+        headers: { Authorization: 'Bearer ' + localStorage.getItem('jwt') },
+      },
+    )
+    .then(() => {
+      location.reload()
+    })
+    .catch(() => {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while charging money',
+        life: 3150,
+      })
+    })
+}
+
+const startDragInventoryItem = (evt, item) => {
+  evt.dataTransfer.dropEffect = 'move'
+  evt.dataTransfer.effectAllowed = 'move'
+  itemForSale.value = item
+  isDraggingInventoryItem.value = true
+}
+
+const getAccountInfo = () => {
+  axios
+    .get(`http://localhost:18124/user/status-dates/${currentAccount.value.login}`)
+    .then((response) => {
+      registrationDate.value = response.data.registrationDate
+      lastLoginDate.value = response.data.lastLoginDate
+    })
+    .catch(() => {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while getting account info',
+        life: 3150,
+      })
+    })
+}
+
+const getGamesCount = () => {
+  axios
+    .get(`http://localhost:18124/library/count/${currentAccount.value.login}`)
+    .then((response) => {
+      gamesCount.value = response.data
+    })
+    .catch(() => {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while getting games count',
+        life: 3150,
+      })
+    })
+}
+
+const getLastPlayedGames = () => {
+  axios
+    .get(`http://localhost:18124/library/last-games/${currentAccount.value.login}`)
+    .then((response) => {
+      lastPlayedGames.value = response.data.splice(3)
+    })
+    .catch(() => {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while getting last played games',
+        life: 3150,
+      })
+    })
+}
+
+const getBalanceAmount = () => {
+  axios
+    .get('http://localhost:18124/user/balance', {
+      headers: { Authorization: 'Bearer ' + localStorage.getItem('jwt') },
+    })
+    .then((response) => {
+      balance.value = response.data.balance
+    })
+    .catch(() => {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while getting balance',
+        life: 3150,
+      })
+    })
+}
+
+const getInvenotoryItems = () => {
+  axios
+    .get('http://localhost:18124/inventory', {
+      headers: { Authorization: 'Bearer ' + localStorage.getItem('jwt') },
+    })
+    .then((response) => {
+      inventoryItems.value = response.data
+    })
+    .catch(() => {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while getting inventory items',
+        life: 3150,
+      })
+    })
+}
+
+const sellPickedInventoryItem = () => {
+  isSellingItem.value = false
+
+  axios
+    .post(
+      'http://localhost:18124/market/sell',
+      {
+        gameName: itemForSale.value.gameName,
+        itemName: itemForSale.value.itemName,
+        rarity: itemForSale.value.rarity,
+        price: priceForSellingItem.value,
+      },
+      {
+        headers: { Authorization: 'Bearer ' + localStorage.getItem('jwt') },
+      },
+    )
+    .then(() => {
+      toast.add({
+        severity: 'success',
+        summary: 'Start trading',
+        detail: 'Your items was published on trading floor!',
+        life: 3150,
+      })
+    })
+    .catch(() => {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while publishing your item on trading floor',
+        life: 3150,
+      })
+    })
+
+  getInvenotoryItems()
+}
+
+onMounted(() => {
+  getAccountInfo()
+  getLastPlayedGames()
+  getGamesCount()
+  getBalanceAmount()
+  getInvenotoryItems()
+})
+</script>
+
+<template>
+  <Dialog v-model:visible="isSellingItem" modal header="Sell item" :style="{ width: '25rem' }">
+    <div class="flex-auto">
+      <label for="price-for-item" class="font-bold block mb-2">Price you want to get</label>
+      <InputNumber
+        v-model="priceForSellingItem"
+        inputId="price-for-item"
+        mode="currency"
+        currency="USD"
+        locale="en-US"
+        :min="0"
+        :max="1000000"
+        fluid
+      />
+    </div>
+    <template #footer>
+      <Button type="button" severity="primary" label="Sell" @click="sellPickedInventoryItem()" />
+    </template>
+  </Dialog>
+
+  <Dialog v-model:visible="isAddingMoney" modal header="Add money" :style="{ width: '25rem' }">
+    <template #header>
+      <p class="text-2xl">Checkout</p>
+    </template>
+    <div class="flex-auto">
+      <label for="money-to-add" class="font-bold block mb-2">Money amount</label>
+      <InputNumber
+        v-model="moneyToAdd"
+        inputId="money-to-add"
+        mode="currency"
+        currency="USD"
+        locale="en-US"
+        :min="0"
+        :max="1000000"
+        fluid
+      />
+    </div>
+    <template #footer>
+      <Button type="button" severity="primary" label="Proceed to checkout" @click="checkout()" />
+    </template>
+  </Dialog>
+
+  <div class="main-panel">
+    <Toast />
+    <div class="main-panel__header">
+      <i class="pi pi-sparkles"></i>
+      <h1 class="text-4xl">Welcome back!</h1>
+    </div>
+    <div
+      class="main-panel__content flex flex-row-reverse w-full gap-3 max-sm:flex-col-reverse mt-10"
+    >
+      <aside class="flex flex-col gap-3 flex-1">
+        <Card class="w-full">
+          <template #header>
+            <div class="flex items-center p-3">
+              <Avatar icon="pi pi-user" class="mr-2" size="large" shape="circle" />
+              <p class="text-2xl">{{ currentAccount.login }}</p>
+            </div>
+          </template>
+          <template #content>
+            <p>Games on account: {{ gamesCount }}</p>
+            <p>Registration date: {{ registrationDate.toISOString() }}</p>
+            <p>Last login date: {{ lastLoginDate }}</p>
+          </template>
+        </Card>
+
+        <Card class="w-full">
+          <template #header>
+            <div class="flex items-center gap-3 p-3">
+              <i class="pi pi-wallet"></i>
+              <p class="text-2xl">Wallet</p>
+            </div>
+          </template>
+          <template #content>
+            <p class="text-xl mb-10">{{ balance }}$</p>
+            <Button
+              class="w-full mb-3"
+              type="button"
+              severity="primary"
+              label="Add money"
+              @click="isAddingMoney = true"
+            />
+            <Button
+              class="w-full item-sell-zone"
+              type="button"
+              :disabled="!isDraggingInventoryItem"
+              :severity="isDraggingInventoryItem ? 'primary' : 'secondary'"
+              label="Drop item here to sell"
+              @drop="isSellingItem = true"
+              @dragover.prevent
+              @dragenter.prevent
+            />
+          </template>
+        </Card>
+      </aside>
+
+      <div class="w-full flex flex-col gap-3 flex-[2]">
+        <Card class="w-full">
+          <template #header>
+            <div class="flex items-center gap-3 p-3">
+              <i class="pi pi-play"></i>
+              <h2 class="text-2xl">Recently played</h2>
+            </div>
+          </template>
+          <template #content>
+            <div class="grid grid-cols-3 gap-3 max-sm:grid-cols-1">
+              <Card
+                v-for="game of lastPlayedGames"
+                v-bind:key="game.name"
+                class="game-card w-full cursor-pointer"
+                @click="router.push('/game/' + game.name)"
+              >
+                <template #header>
+                  <img :src="game.picture" :alt="game.name" />
+                </template>
+                <template #content>
+                  <p>{{ game.name }}</p>
+                </template>
+              </Card>
+            </div>
+          </template>
+        </Card>
+
+        <Card class="w-full">
+          <template #header>
+            <div class="flex items-center gap-3 p-3">
+              <i class="pi pi-box"></i>
+              <h2 class="text-2xl">Your inventory</h2>
+            </div>
+          </template>
+          <template #content>
+            <p v-if="!inventoryItems || inventoryItems.length === 0">Inventory is empty</p>
+            <div class="flex gap-3 flex-wrap">
+              <img
+                :src="item.picture"
+                :alt="item.name"
+                v-for="item of inventoryItems"
+                v-bind:key="item.name"
+                class="cursor-pointer w-36 h-36"
+                draggable
+                @dragstart="startDragInventoryItem($event, item)"
+                @dragend="isDraggingInventoryItem = false"
+              />
+            </div>
+          </template>
+        </Card>
+      </div>
+    </div>
+  </div>
+</template>
+
+<style>
+.game-card {
+  @apply bg-primary-800;
+}
+</style>
