@@ -7,8 +7,6 @@ import { useRouter } from 'vue-router'
 const toast = useToast()
 const router = useRouter()
 
-const newGames = reactive([]) // TODO
-
 const allGames = ref([
   {
     gameName: 'Test',
@@ -96,19 +94,19 @@ watchEffect(filterTrigger)
           <template #title>{{ game.gameName }}</template>
           <template #content>
             <p class="m-0">
-                <div class="catalog_item_name">
-                  <div class="catalog_item_name_genre">
-                    <div class="genre_class">{{ game.genres.join(', ') }}</div>
-                  </div>
+              <div class="catalog_item_name">
+                <div class="catalog_item_name_genre">
+                  <div class="genre_class">{{ game.genres.join(', ') }}</div>
                 </div>
+              </div>
 
-                <div class="catalog_item_price">
-                  <span v-if="game.price > 0" class="catalog_item_price_span">
-                    {{ game.price.toFixed(2) }}$
-                  </span>
+              <div class="catalog_item_price">
+                <span v-if="game.price > 0" class="catalog_item_price_span">
+                  {{ game.price.toFixed(2) }}$
+                </span>
 
-                  <span v-else class="catalog_item_price_span">FREE</span>
-                </div>
+                <span v-else class="catalog_item_price_span">FREE</span>
+              </div>
             </p>
           </template>
         </Card>

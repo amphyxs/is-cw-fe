@@ -15,26 +15,32 @@ const items = ref([
   {
     label: 'Store',
     icon: StoreIcon,
+    link: '/store',
   },
   {
     label: 'Library',
     icon: GameIcon,
+    link: '/library',
   },
   {
     label: 'About us',
     icon: InfoIcon,
+    link: '/about',
   },
   {
     label: 'Trading',
     icon: ExchangeIcon,
+    link: '/trading',
   },
   {
     label: 'Profile',
     icon: ProfileIcon,
+    link: '/profile',
   },
   {
     label: 'Cart',
     icon: CartIcon,
+    link: '/cart',
   },
 ])
 </script>
@@ -45,11 +51,11 @@ const items = ref([
   <Dock :model="items" :position="'bottom'" class="nav">
     <template #itemicon="{ item }">
       <img
-        @click="router.push('/store')"
+        class="cursor-pointer"
+        @click="router.push(item.link)"
         v-tooltip.top="item.label"
         :alt="item.label"
         :src="item.icon"
-        style="width: 100%"
       />
     </template>
   </Dock>

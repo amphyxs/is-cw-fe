@@ -5,7 +5,7 @@ import MainPageImage from '../assets/main-page-banner.jpg'
 <template>
   <img :src="MainPageImage" alt="Par" class="banner" />
 
-  <main>
+  <main class="mt-5">
     <div class="card flex flex-col items-center">
       <div class="flex flex-col items-center gap-2">
         <span class="text-xl font-medium">Welcome to Par Store!</span>
@@ -19,28 +19,4 @@ import MainPageImage from '../assets/main-page-banner.jpg'
   </main>
 </template>
 
-<style scoped>
-main {
-  margin-top: 5rem;
-}
-
-@keyframes slidedown-icon {
-  0% {
-    transform: translateY(0);
-  }
-
-  50% {
-    transform: translateY(20px);
-  }
-
-  100% {
-    transform: translateY(0);
-  }
-}
-
-.slidedown-icon {
-  animation: slidedown-icon;
-  animation-duration: 3s;
-  animation-iteration-count: infinite;
-}
-</style>
+<style scoped></style>
