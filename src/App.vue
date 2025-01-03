@@ -8,6 +8,7 @@ import InfoIcon from './assets/info.svg'
 import ExchangeIcon from './assets/exchange.svg'
 import ProfileIcon from './assets/profile.svg'
 import CartIcon from './assets/cart.svg'
+import GuideIcon from './assets/book.svg'
 
 const router = useRouter()
 
@@ -31,6 +32,11 @@ const items = ref([
     label: 'Trading',
     icon: ExchangeIcon,
     link: '/trading',
+  },
+  {
+    label: 'Guides',
+    icon: GuideIcon,
+    link: '/guides',
   },
   {
     label: 'Profile',

@@ -118,6 +118,4 @@ watchEffect(filterTrigger)
 </template>
 
 <style>
-.filters {
-}
 </style>
