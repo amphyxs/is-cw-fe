@@ -1,5 +1,5 @@
 <script setup>
-import { RouterView } from 'vue-router'
+import { RouterView, useRouter } from 'vue-router'
 import { ref } from 'vue'
 import Dock from 'primevue/dock'
 import StoreIcon from './assets/store.svg'
@@ -8,6 +8,8 @@ import InfoIcon from './assets/info.svg'
 import ExchangeIcon from './assets/exchange.svg'
 import ProfileIcon from './assets/profile.svg'
 import CartIcon from './assets/cart.svg'
+
+const router = useRouter()
 
 const items = ref([
   {
@@ -42,7 +44,13 @@ const items = ref([
 
   <Dock :model="items" :position="'bottom'" class="nav">
     <template #itemicon="{ item }">
-      <img v-tooltip.top="item.label" :alt="item.label" :src="item.icon" style="width: 100%" />
+      <img
+        @click="router.push('/store')"
+        v-tooltip.top="item.label"
+        :alt="item.label"
+        :src="item.icon"
+        style="width: 100%"
+      />
     </template>
   </Dock>
 </template>

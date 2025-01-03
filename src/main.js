@@ -6,6 +6,7 @@ import router from './router'
 import PrimeVue from 'primevue/config'
 import Aura from '@primevue/themes/aura'
 import AnimateOnScroll from 'primevue/animateonscroll'
+import ToastService from 'primevue/toastservice'
 
 const app = createApp(App)
 
@@ -21,5 +22,6 @@ app.use(PrimeVue, {
   },
 })
 app.directive('animateonscroll', AnimateOnScroll)
+app.use(ToastService)
 
 app.mount('#app')
