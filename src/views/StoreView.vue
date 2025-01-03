@@ -3,6 +3,7 @@ import { ref, reactive, onMounted, watchEffect } from 'vue'
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast' // Assuming you are using PrimeVue for toasts
 import { useRouter } from 'vue-router'
+import { startDragElementToBuy, stopDragElementToBuy } from '../store/CartStore'
 
 const toast = useToast()
 const router = useRouter()
@@ -87,6 +88,9 @@ watchEffect(filterTrigger)
           v-for="game in allGames"
           :key="game.gameName"
           @click="router.push('/game/' + game.gameName)"
+          draggable="true"
+          @dragstart="startDragElementToBuy($event, game, 'game')"
+          @dragend="stopDragElementToBuy()"
         >
           <template #header>
             <img class="img_catalog_class" v-bind:src="game.pictureShop" />

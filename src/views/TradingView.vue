@@ -2,6 +2,7 @@
 import { ref, reactive, onMounted, watchEffect } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import axios from 'axios'
+import { startDragElementToBuy, stopDragElementToBuy } from '../store/CartStore'
 
 const toast = useToast()
 
@@ -81,6 +82,9 @@ watchEffect(filterTrigger)
           class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row"
           v-for="item in itemsOnSale"
           :key="item.itemName"
+          draggable="true"
+          @dragstart="startDragElementToBuy($event, item, 'gameItem')"
+          @dragend="stopDragElementToBuy()"
         >
           <template #header>
             <img class="img_catalog_class" v-bind:src="item.itemPicture" />
