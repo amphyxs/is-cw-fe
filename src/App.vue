@@ -9,7 +9,8 @@ import ExchangeIcon from './assets/exchange.svg'
 import ProfileIcon from './assets/profile.svg'
 import CartIcon from './assets/cart.svg'
 import GuideIcon from './assets/book.svg'
-import { isDraggingElementToBuy } from './store/CartStore'
+import { isDraggingElementToBuy } from '@/shared/buy-elemets'
+import { isLoggedIn } from '@/shared/account'
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast'
 
@@ -172,7 +173,7 @@ const onDropElementToBuy = (evt) => {
 <template>
   <RouterView />
 
-  <Dock :model="items" :position="'bottom'" class="nav">
+  <Dock v-if="isLoggedIn()" :model="items" :position="'bottom'" class="nav">
     <template #itemicon="{ item }">
       <img
         class="cursor-pointer"

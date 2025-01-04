@@ -2,7 +2,7 @@
 import { ref, reactive, onMounted, watchEffect } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import axios from 'axios'
-import { startDragElementToBuy, stopDragElementToBuy } from '../store/CartStore'
+import { startDragElementToBuy, stopDragElementToBuy } from '@/shared/buy-elemets'
 
 const toast = useToast()
 
