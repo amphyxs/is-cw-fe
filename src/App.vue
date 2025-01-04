@@ -11,10 +11,9 @@ import CartIcon from './assets/cart.svg'
 import GuideIcon from './assets/book.svg'
 import UploadGameIcon from './assets/upload-game.svg'
 import { isDraggingElementToBuy } from '@/shared/buy-elements'
-import { isLoggedIn } from '@/shared/account'
+import { isLoggedIn, currentAccount } from '@/shared/account'
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast'
-import { getCurrentAccount } from '@/shared/account'
 
 const toast = useToast()
 const router = useRouter()
@@ -69,18 +68,18 @@ const items = ref([
 ])
 
 const availableItems = computed(() =>
-  items.value.filter((item) => !item.roleNeeded || getCurrentAccount().role === item.roleNeeded),
+  items.value.filter((item) => !item.roleNeeded || currentAccount.value.role === item.roleNeeded),
 )
 
 const buyGame = (game) => {
   axios
     .post(
-      'http://localhost:18124/game/buy_game',
+      'http://localhost:18124/game',
       {
-        game_name: game.gameName,
+        gameName: game.gameName,
       },
       {
-        headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
+        headers: { Authorization: 'Bearer ' + currentAccount.value.token },
       },
     )
     .then(() => {
@@ -130,7 +129,7 @@ const buyItem = (item) => {
         marketId: item.marketId,
       },
       {
-        headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
+        headers: { Authorization: 'Bearer ' + currentAccount.value.token },
       },
     )
     .then(() => {
@@ -190,7 +189,7 @@ const onDropElementToBuy = (evt) => {
 <template>
   <RouterView />
 
-  <Dock v-if="isLoggedIn()" :model="availableItems" :position="'bottom'" class="nav">
+  <Dock v-if="isLoggedIn" :model="availableItems" :position="'bottom'" class="nav">
     <template #itemicon="{ item }">
       <img
         class="cursor-pointer"

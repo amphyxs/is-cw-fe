@@ -1,9 +1,14 @@
-export const getCurrentAccount = () => {
-  const token = localStorage.getItem('token')
-  const login = localStorage.getItem('login')
-  const role = localStorage.getItem('role')
+import { computed, ref } from 'vue'
 
-  return { token, login, role }
+export const currentAccount = ref({
+  token: localStorage.getItem('token'),
+  login: localStorage.getItem('login'),
+  role: localStorage.getItem('role'),
+})
+
+// TODO: remove this
+export const getCurrentAccount = () => {
+  return currentAccount.value
 }
 
 export const storeCurrentAccount = ({ token, login, role }) => {
@@ -11,10 +16,20 @@ export const storeCurrentAccount = ({ token, login, role }) => {
     localStorage.setItem('token', token)
     localStorage.setItem('login', login)
     localStorage.setItem('role', role)
+
+    currentAccount.value = { token, login, role }
   }
 }
 
-export const isLoggedIn = () => {
+export const isLoggedIn = computed(() => {
   // TODO: check token
-  return !!getCurrentAccount().login
+  return !!currentAccount.value?.login
+})
+
+export const signOut = () => {
+  localStorage.removeItem('token')
+  localStorage.removeItem('login')
+  localStorage.removeItem('role')
+  currentAccount.value = null
+  location.reload()
 }

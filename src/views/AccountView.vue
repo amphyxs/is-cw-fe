@@ -3,7 +3,7 @@ import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast' // Assuming you are using PrimeVue for toasts
 import { useRouter } from 'vue-router'
-import { getCurrentAccount } from '@/shared/account'
+import { getCurrentAccount, signOut } from '@/shared/account'
 import NoPhoto from '@/assets/no-photo.jpg'
 
 const toast = useToast()
@@ -253,6 +253,9 @@ onMounted(() => {
             <p>Games on account: {{ gamesCount }}</p>
             <p>Registration date: {{ registrationDate }}</p>
             <p>Last login date: {{ lastLoginDate }}</p>
+          </template>
+          <template #footer>
+            <Button class="w-full" severity="danger" label="Sign out" @click="signOut()" />
           </template>
         </Card>
 

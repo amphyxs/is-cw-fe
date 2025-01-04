@@ -3,7 +3,7 @@ import HomeView from '@/views/HomeView.vue'
 import { isLoggedIn, getCurrentAccount } from '@/shared/account'
 
 const loggedInGuard = (_, __, next) => {
-  if (isLoggedIn()) {
+  if (isLoggedIn.value) {
     next()
     return
   }
@@ -15,7 +15,7 @@ const loggedInGuard = (_, __, next) => {
 
 const loggedInAndHasRoleGuard = (role) => {
   return (_, __, next) => {
-    if (isLoggedIn() && getCurrentAccount().role === role) {
+    if (isLoggedIn.value && getCurrentAccount().role === role) {
       next()
       return
     }
