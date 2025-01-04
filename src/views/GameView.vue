@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, watchEffect } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast' // Assuming you are using PrimeVue for toasts
 import { useRouter } from 'vue-router'
@@ -7,27 +7,17 @@ import { useRouter } from 'vue-router'
 const toast = useToast()
 const router = useRouter()
 
-const gameInfo = ref({
-  price: 100.0,
-  genres: ['Action', 'Adventure'],
-  developmentDate: new Date(),
-  devLogin: 'Alex',
-  description:
-    'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.',
-  pictureCover: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
-  sliderItems: [
-    'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
-    'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
-    'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
-  ],
-})
+const gameInfo = ref(null)
+const galleriaImages = computed(() => [
+  gameInfo.value.pictureGameplay1,
+  gameInfo.value.pictureGameplay2,
+  gameInfo.value.pictureGameplay3,
+])
 const props = defineProps(['gameName'])
 
 const getInfo = () => {
   axios
-    .post('http://localhost:18124/game/get_game_info', {
-      game_name: props.gameName,
-    })
+    .get(`http://localhost:18124/game/${props.gameName}`)
     .then((response) => {
       gameInfo.value = response.data
     })
@@ -38,7 +28,9 @@ const getInfo = () => {
         detail: 'Error while getting game',
         life: 3150,
       })
-      router.back()
+      setTimeout(() => {
+        router.back()
+      }, 2000)
     })
 }
 
@@ -50,9 +42,13 @@ onMounted(() => {
 <template>
   <div class="main-panel">
     <Toast />
-    <div class="main-panel__content flex flex-row-reverse w-full gap-4 max-sm:flex-col">
+    <Skeleton v-if="!gameInfo" width="100%" height="150px"></Skeleton>
+    <div
+      v-else
+      class="main-panel__content flex flex-row-reverse w-full gap-4 max-sm:flex-col-reverse"
+    >
       <aside class="flex flex-col gap-4">
-        <Card class="w-72">
+        <Card class="w-72 max-sm:w-full">
           <template #header>
             <div class="flex items-center gap-3 p-3">
               <i class="pi pi-eye"></i>
@@ -60,11 +56,7 @@ onMounted(() => {
             </div>
           </template>
           <template #content>
-            <Galleria
-              :value="gameInfo.sliderItems"
-              :numVisible="1"
-              containerStyle="max-width: 640px"
-            >
+            <Galleria :value="galleriaImages" :numVisible="1" containerStyle="max-width: 640px">
               <template #item="slotProps">
                 <img :src="slotProps.item" alt="Gameplay preview" style="width: 100%" />
               </template>
@@ -74,7 +66,7 @@ onMounted(() => {
             </Galleria>
           </template>
         </Card>
-        <Card class="w-72">
+        <Card class="w-72 max-sm:w-full">
           <template #header>
             <div class="flex items-center gap-3 p-3">
               <i class="pi pi-wallet"></i>
@@ -114,7 +106,7 @@ onMounted(() => {
           </div>
           <div class="flex items-center gap-2">
             <i class="pi pi-book text-primary"></i>
-            <p><span class="text-primary">Description:</span> {{ gameInfo.description }}</p>
+            <p><span class="text-primary">Description:</span> {{ gameInfo.gameDescription }}</p>
           </div>
         </template>
       </Card>
