@@ -1,39 +1,48 @@
 <script setup>
-import { ref, reactive, onMounted, watchEffect } from 'vue'
+import { ref, watchEffect, onMounted } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import axios from 'axios'
 import { startDragElementToBuy, stopDragElementToBuy } from '@/shared/buy-elements'
+import { getCurrentAccount } from '@/shared/account'
 
 const toast = useToast()
 
-const allGames = ref([
-  {
-    gameName: 'Test',
-    pictureShop: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
-    genres: ['Action'],
-    price: 2213.13421
-  }
-])
+const allGames = ref([])
 const itemName = ref('');
-const selectedGame = ref('');
-const itemsOnSale = ref([
-  {
-    itemName: 'xxx',
-    itemPicture: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
-    rarity: 'rare',
-    price: 2213.13421,
-    gameName: 'Test'
-  }
-]);
+const selectedGame = ref(null);
+const itemsOnSale = ref([]);
 
-const filterTrigger = () => {
+const getAllGames = () => {
+  axios
+    .get('http://localhost:18124/game', {
+      headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
+    })
+    .then((response) => {
+      allGames.value = response.data
+      selectedGame.value = allGames.value?.length > 0 ? allGames.value[0] : null
+    })
+    .catch(() => {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while getting games',
+        life: 3150,
+      })
+    })
+}
+
+const getMarketItems = () => {
+  if (!selectedGame.value) {
+    return;
+  }
+
       axios.get("http://localhost:18124/market", {
         params: {
-          gameName: selectedGame.value.gameName,
+          gameName: selectedGame.value.name,
           itemName: itemName.value
         }
       }).then(response => {
-        this.allSlots = response.data;
+        itemsOnSale.value = response.data;
       }).catch(() => {
         toast.add({
         severity: 'error',
@@ -44,10 +53,16 @@ const filterTrigger = () => {
       })
 }
 
-watchEffect(filterTrigger)
+onMounted(() => {
+  getAllGames();
+})
+
+watchEffect(getMarketItems)
 </script>
 
 <template>
+<!-- eslint-disable vue/no-parsing-error -->
+
   <div class="main-panel">
     <Toast />
     <div class="main-panel__header">
@@ -68,50 +83,49 @@ watchEffect(filterTrigger)
           <Listbox v-model="selectedGame" :options="allGames" optionLabel="gameName" class="w-full md:w-56" listStyle="max-height:250px">
             <template #option="slotProps">
               <div class="flex items-center">
-                <img :alt="slotProps.option.gameName" :src="slotProps.option.pictureShop" class="flag mr-2" style="width: 18px" />
-                <div>{{ slotProps.option.gameName }}</div>
+                <div>{{ slotProps.option.name }}</div>
               </div>
             </template>
           </Listbox>
         </div>
       </aside>
 
-      <div class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5">
-        <Card
+      <div  class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5">
+        <template
           v-if="itemsOnSale.length > 0"
-          class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row"
-          v-for="item in itemsOnSale"
-          :key="item.itemName"
-          draggable="true"
-          @dragstart="startDragElementToBuy($event, item, 'gameItem')"
-          @dragend="stopDragElementToBuy()"
         >
-          <template #header>
-            <img class="img_catalog_class" v-bind:src="item.itemPicture" />
-          </template>
-          <template #title>
-            <div class="flex gap-3">
-              <p class="text-3xl">{{ item.itemName }}</p>
-              <Message class="w-fit" severity="error" v-if="item.rarity === 'rare'">RARE</Message>
-              <Message class="w-fit" severity="info" v-else-if="item.rarity === 'normal'">NORMAL</Message>
-            </div>
-          </template>
-          <template #content>
-
-            <p class="text-primary-200">from {{ item.gameName }}</p>
-
-            <p class="m-0">
-              <div class="catalog_item_price">
-                <span v-if="item.price > 0" class="catalog_item_price_span">
-                  {{ item.price.toFixed(2) }}$
-                </span>
-
-                <span v-else class="catalog_item_price_span">FREE</span>
+          <Card
+            class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row"
+            v-for="item in itemsOnSale"
+            :key="item.itemName"
+            draggable="true"
+            @dragstart="startDragElementToBuy($event, item, 'gameItem')"
+            @dragend="stopDragElementToBuy()"
+          >
+            <template #header>
+              <img class="img_catalog_class" v-bind:src="item.itemPicture" alt="Game item" />
+            </template>
+            <template #title>
+              <div class="flex gap-3">
+                <p class="text-3xl">{{ item.itemName }}</p>
+                <Message class="w-fit" severity="error" v-if="item.rarity === 'rare'">RARE</Message>
+                <Message class="w-fit" severity="info" v-else-if="item.rarity === 'normal'">NORMAL</Message>
               </div>
-            </p>
-          </template>
-        </Card>
+            </template>
+            <template #content>
+              <p class="text-primary-200">from {{ item.gameName }}</p>
 
+              <p class="m-0">
+                <div class="catalog_item_price">
+                  <span v-if="item.price > 0" class="catalog_item_price_span">
+                    {{ item.price.toFixed(2) }}$
+                  </span>
+                  <span v-else class="catalog_item_price_span">FREE</span>
+                </div>
+              </p>
+            </template>
+          </Card>
+        </template>
         <div v-else class="text-center mt-10 text-3xl">Nothing found!</div>
       </div>
     </div>

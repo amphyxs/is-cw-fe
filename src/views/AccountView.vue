@@ -18,8 +18,8 @@ const itemForSale = ref(null)
 const isAddingMoney = ref(false)
 const isDraggingInventoryItem = ref(false)
 const isSellingItem = ref(false)
-const inventoryItems = ref()
-const lastPlayedGames = ref()
+const inventoryItems = ref([])
+const lastPlayedGames = ref([])
 
 const addMoneyOnBalance = () => {
   isAddingMoney.value = false
@@ -328,12 +328,12 @@ onMounted(() => {
             </p>
             <div class="flex gap-3 flex-wrap">
               <img
-                :src="item.picture"
-                :alt="item.name"
+                :src="item.itemPicture"
+                :alt="item.itemName"
                 v-for="item of inventoryItems"
-                v-bind:key="item.name"
+                v-bind:key="item.itemName"
                 class="cursor-pointer w-36 h-36"
-                draggable
+                draggable="true"
                 @dragstart="startDragInventoryItem($event, item)"
                 @dragend="isDraggingInventoryItem = false"
               />

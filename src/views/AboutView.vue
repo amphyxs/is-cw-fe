@@ -28,7 +28,7 @@ import MainPageImage from '../assets/main-page-banner.jpg'
       class="info-card"
     >
       <i class="pi pi-lock-open info-card__icon" />
-      <span class="info-card__text"> Without DRM </span>
+      <span class="info-card__text"> Game is your after you buy it </span>
     </div>
     <div class="h-[30rem]"></div>
     <div
