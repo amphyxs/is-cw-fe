@@ -76,8 +76,10 @@ import { useToast } from 'primevue/usetoast'
 import MainBannerImage from '@/assets/main-page-banner.jpg'
 import axios from 'axios'
 import { storeCurrentAccount } from '@/shared/account'
+import { useRouter } from 'vue-router'
 
 const toast = useToast()
+const router = useRouter()
 
 const initialValues = reactive({
   email: '',
@@ -144,12 +146,14 @@ const signUp = ({ email, login, password, isDev }) => {
         login: response.data.login,
         role,
       })
+
+      router.push('/account')
     })
-    .catch(() => {
+    .catch((error) => {
       toast.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'Error while signing up',
+        detail: error.response.data.message,
         life: 3150,
       })
     })

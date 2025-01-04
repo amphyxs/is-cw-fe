@@ -27,7 +27,7 @@ const filterTrigger = () => {
         game_name: gameName.value,
       },
       {
-        headers: { Authorization: 'Bearer ' + localStorage.getItem('jwt') },
+        headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
       },
     )
     .then((response) => {
@@ -50,7 +50,7 @@ const enterGame = (game) => {
       game_name: game,
     },
     {
-      headers: { Authorization: 'Bearer ' + localStorage.getItem('jwt') },
+      headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
     },
   )
 

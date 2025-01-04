@@ -1,19 +1,16 @@
 <script setup>
-import { ref, reactive, onMounted, watchEffect } from 'vue'
+import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast' // Assuming you are using PrimeVue for toasts
 import { useRouter } from 'vue-router'
+import { getCurrentAccount } from '@/shared/account'
 
 const toast = useToast()
 const router = useRouter()
 
-const currentAccount = ref({
-  login: 'test',
-  role: 'user',
-})
 const gamesCount = ref(0)
-const lastLoginDate = ref(new Date())
-const registrationDate = ref(new Date())
+const lastLoginDate = ref('')
+const registrationDate = ref('')
 const balance = ref(0)
 const moneyToAdd = ref(0)
 const priceForSellingItem = ref(0)
@@ -21,42 +18,10 @@ const itemForSale = ref(null)
 const isAddingMoney = ref(false)
 const isDraggingInventoryItem = ref(false)
 const isSellingItem = ref(false)
-const inventoryItems = ref([
-  {
-    picture: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
-    gameName: 'text',
-    itemName: 'text',
-    rarity: 'rare',
-  },
-  {
-    picture: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
-    gameName: 'text',
-    itemName: 'text',
-    rarity: 'rare',
-  },
-  {
-    picture: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
-    gameName: 'text',
-    itemName: 'text',
-    rarity: 'rare',
-  },
-])
-const lastPlayedGames = ref([
-  {
-    picture: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
-    name: 'text',
-  },
-  {
-    picture: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
-    name: 'text',
-  },
-  {
-    picture: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
-    name: 'text',
-  },
-])
+const inventoryItems = ref()
+const lastPlayedGames = ref()
 
-const checkout = () => {
+const addMoneyOnBalance = () => {
   isAddingMoney.value = false
 
   axios
@@ -66,11 +31,11 @@ const checkout = () => {
         balance: moneyToAdd.value,
       },
       {
-        headers: { Authorization: 'Bearer ' + localStorage.getItem('jwt') },
+        headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
       },
     )
     .then(() => {
-      location.reload()
+      getBalanceAmount()
     })
     .catch(() => {
       toast.add({
@@ -91,7 +56,7 @@ const startDragInventoryItem = (evt, item) => {
 
 const getAccountInfo = () => {
   axios
-    .get(`http://localhost:18124/user/status-dates/${currentAccount.value.login}`)
+    .get(`http://localhost:18124/user/status-dates/${getCurrentAccount().login}`)
     .then((response) => {
       registrationDate.value = response.data.registrationDate
       lastLoginDate.value = response.data.lastLoginDate
@@ -108,7 +73,7 @@ const getAccountInfo = () => {
 
 const getGamesCount = () => {
   axios
-    .get(`http://localhost:18124/library/count/${currentAccount.value.login}`)
+    .get(`http://localhost:18124/library/count/${getCurrentAccount().login}`)
     .then((response) => {
       gamesCount.value = response.data
     })
@@ -124,7 +89,7 @@ const getGamesCount = () => {
 
 const getLastPlayedGames = () => {
   axios
-    .get(`http://localhost:18124/library/last-games/${currentAccount.value.login}`)
+    .get(`http://localhost:18124/library/last-games/${getCurrentAccount().login}`)
     .then((response) => {
       lastPlayedGames.value = response.data.splice(3)
     })
@@ -141,7 +106,7 @@ const getLastPlayedGames = () => {
 const getBalanceAmount = () => {
   axios
     .get('http://localhost:18124/user/balance', {
-      headers: { Authorization: 'Bearer ' + localStorage.getItem('jwt') },
+      headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
     })
     .then((response) => {
       balance.value = response.data.balance
@@ -159,7 +124,7 @@ const getBalanceAmount = () => {
 const getInvenotoryItems = () => {
   axios
     .get('http://localhost:18124/inventory', {
-      headers: { Authorization: 'Bearer ' + localStorage.getItem('jwt') },
+      headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
     })
     .then((response) => {
       inventoryItems.value = response.data
@@ -187,7 +152,7 @@ const sellPickedInventoryItem = () => {
         price: priceForSellingItem.value,
       },
       {
-        headers: { Authorization: 'Bearer ' + localStorage.getItem('jwt') },
+        headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
       },
     )
     .then(() => {
@@ -252,12 +217,17 @@ onMounted(() => {
         currency="USD"
         locale="en-US"
         :min="0"
-        :max="1000000"
+        :max="500"
         fluid
       />
     </div>
     <template #footer>
-      <Button type="button" severity="primary" label="Proceed to checkout" @click="checkout()" />
+      <Button
+        type="button"
+        severity="primary"
+        label="Proceed to checkout"
+        @click="addMoneyOnBalance()"
+      />
     </template>
   </Dialog>
 
@@ -275,12 +245,12 @@ onMounted(() => {
           <template #header>
             <div class="flex items-center p-3">
               <Avatar icon="pi pi-user" class="mr-2" size="large" shape="circle" />
-              <p class="text-2xl">{{ currentAccount.login }}</p>
+              <p class="text-2xl">{{ getCurrentAccount().login }}</p>
             </div>
           </template>
           <template #content>
             <p>Games on account: {{ gamesCount }}</p>
-            <p>Registration date: {{ registrationDate.toISOString() }}</p>
+            <p>Registration date: {{ registrationDate }}</p>
             <p>Last login date: {{ lastLoginDate }}</p>
           </template>
         </Card>
@@ -324,7 +294,10 @@ onMounted(() => {
             </div>
           </template>
           <template #content>
-            <div class="grid grid-cols-3 gap-3 max-sm:grid-cols-1">
+            <p v-if="!lastPlayedGames || lastPlayedGames.length === 0" class="text-center">
+              You haven't played any games yet
+            </p>
+            <div v-else class="grid grid-cols-3 gap-3 max-sm:grid-cols-1">
               <Card
                 v-for="game of lastPlayedGames"
                 v-bind:key="game.name"
@@ -350,7 +323,9 @@ onMounted(() => {
             </div>
           </template>
           <template #content>
-            <p v-if="!inventoryItems || inventoryItems.length === 0">Inventory is empty</p>
+            <p class="text-center" v-if="!inventoryItems || inventoryItems.length === 0">
+              Inventory is empty
+            </p>
             <div class="flex gap-3 flex-wrap">
               <img
                 :src="item.picture"

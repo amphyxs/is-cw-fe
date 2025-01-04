@@ -1,5 +1,5 @@
 export const getCurrentAccount = () => {
-  const token = localStorage.getItem('jwt')
+  const token = localStorage.getItem('token')
   const login = localStorage.getItem('login')
   const role = localStorage.getItem('role')
 
@@ -7,9 +7,11 @@ export const getCurrentAccount = () => {
 }
 
 export const storeCurrentAccount = ({ token, login, role }) => {
-  localStorage.setItem('token', token)
-  localStorage.setItem('login', login)
-  localStorage.setItem('role', role)
+  if (token && login && role) {
+    localStorage.setItem('token', token)
+    localStorage.setItem('login', login)
+    localStorage.setItem('role', role)
+  }
 }
 
 export const isLoggedIn = () => {

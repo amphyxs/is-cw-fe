@@ -49,8 +49,10 @@ import { useToast } from 'primevue/usetoast'
 import MainBannerImage from '@/assets/main-page-banner.jpg'
 import axios from 'axios'
 import { storeCurrentAccount } from '@/shared/account'
+import { useRouter } from 'vue-router'
 
 const toast = useToast()
+const router = useRouter()
 
 const initialValues = reactive({
   login: '',
@@ -93,14 +95,25 @@ const signIn = ({ login, password }) => {
         login: response.data.login,
         role: response.data.roles[0],
       })
+
+      router.push('/account')
     })
-    .catch(() => {
-      toast.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Error while signing in',
-        life: 3150,
-      })
+    .catch((response) => {
+      if (response.status === 400) {
+        toast.add({
+          severity: 'error',
+          summary: 'Wrong credentials',
+          detail: 'Login or password is wrong',
+          life: 3150,
+        })
+      } else {
+        toast.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Error while signing in',
+          life: 3150,
+        })
+      }
     })
 }
 </script>

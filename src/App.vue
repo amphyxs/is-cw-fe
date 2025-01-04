@@ -10,7 +10,7 @@ import ProfileIcon from './assets/profile.svg'
 import CartIcon from './assets/cart.svg'
 import GuideIcon from './assets/book.svg'
 import UploadGameIcon from './assets/upload-game.svg'
-import { isDraggingElementToBuy } from '@/shared/buy-elemets'
+import { isDraggingElementToBuy } from '@/shared/buy-elements'
 import { isLoggedIn } from '@/shared/account'
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast'
@@ -80,7 +80,7 @@ const buyGame = (game) => {
         game_name: game.gameName,
       },
       {
-        headers: { Authorization: 'Bearer ' + localStorage.getItem('jwt') },
+        headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
       },
     )
     .then(() => {
@@ -130,7 +130,7 @@ const buyItem = (item) => {
         marketId: item.marketId,
       },
       {
-        headers: { Authorization: 'Bearer ' + localStorage.getItem('jwt') },
+        headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
       },
     )
     .then(() => {

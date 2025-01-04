@@ -56,7 +56,7 @@ const guideText = ref('')
 const getAllGamesByLogin = () => {
   axios
     .get('http://localhost:18124/game/get_all_games_by_login', {
-      headers: { Authorization: 'Bearer ' + localStorage.getItem('jwt') },
+      headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
     })
     .then((response) => {
       this.allGames = response.data
@@ -98,7 +98,7 @@ const submitGuide = () => {
         guide_text: guideText.value,
       },
       {
-        headers: { Authorization: 'Bearer ' + localStorage.getItem('jwt') },
+        headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
       },
     )
     .then((response) => {

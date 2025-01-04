@@ -3,7 +3,7 @@ import { ref, reactive, onMounted, watchEffect } from 'vue'
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast' // Assuming you are using PrimeVue for toasts
 import { useRouter } from 'vue-router'
-import { startDragElementToBuy, stopDragElementToBuy } from '@/shared/buy-elemets'
+import { startDragElementToBuy, stopDragElementToBuy } from '@/shared/buy-elements'
 
 const toast = useToast()
 const router = useRouter()

@@ -76,7 +76,7 @@ const uploadGame = (values) => {
         legendary_item_url: values.legendaryItemPictureUrl.value,
       },
       {
-        headers: { Authorization: 'Bearer ' + localStorage.getItem('jwt') },
+        headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
       },
     )
     .then(() => {
