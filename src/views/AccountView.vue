@@ -92,7 +92,7 @@ const getLastPlayedGames = () => {
   axios
     .get(`http://localhost:18124/library/last-games/${getCurrentAccount().login}`)
     .then((response) => {
-      lastPlayedGames.value = response.data
+      lastPlayedGames.value = response.data.slice(0, 3)
     })
     .catch(() => {
       toast.add({
@@ -306,7 +306,10 @@ onMounted(() => {
                 @click="router.push('/game/' + game.gameName)"
               >
                 <template #header>
-                  <img :src="game.shopPicture ?? NoPhoto" :alt="game.gameName" />
+                  <div
+                    class="w-full aspect-square bg-cover bg-center"
+                    :style="`background-image: url(${game.shopPicture ?? NoPhoto})`"
+                  />
                 </template>
                 <template #content>
                   <p>{{ game.gameName }}</p>

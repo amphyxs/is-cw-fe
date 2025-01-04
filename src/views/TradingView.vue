@@ -103,7 +103,10 @@ watchEffect(getMarketItems)
             @dragend="stopDragElementToBuy()"
           >
             <template #header>
-              <img class="img_catalog_class" v-bind:src="item.itemPicture" alt="Game item" />
+              <div
+                class="w-full aspect-square bg-cover bg-center"
+                :style="`background-image: url(${item.itemPicture ?? NoPhoto})`"
+              />
             </template>
             <template #title>
               <div class="flex gap-3">

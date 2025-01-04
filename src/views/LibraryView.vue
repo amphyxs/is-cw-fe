@@ -86,10 +86,9 @@ watchEffect(getGamesInLibrary)
             :key="game.gameName"
           >
             <template #header>
-              <img
-                class="img_catalog_class"
-                v-bind:src="game.pictureShop ?? NoPhoto"
-                alt="Game preview"
+              <div
+                class="w-full aspect-square bg-cover bg-center"
+                :style="`background-image: url(${game.pictureShop ?? NoPhoto})`"
               />
             </template>
             <template #title>{{ game.gameName }}</template>

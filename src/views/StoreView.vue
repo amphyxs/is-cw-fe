@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, watchEffect } from 'vue'
+import { ref, watchEffect } from 'vue'
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast' // Assuming you are using PrimeVue for toasts
 import { useRouter } from 'vue-router'
@@ -8,14 +8,7 @@ import { startDragElementToBuy, stopDragElementToBuy } from '@/shared/buy-elemen
 const toast = useToast()
 const router = useRouter()
 
-const allGames = ref([
-  {
-    gameName: 'Test',
-    pictureShop: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
-    genres: ['Action'],
-    price: 2213.13421
-  }
-])
+const allGames = ref([])
 const gameName = ref('')
 const selectedCategories = ref([])
 const categories = ref([
@@ -29,11 +22,16 @@ const categories = ref([
   { name: 'Sport', key: 'sport' },
 ])
 
-const filterTrigger = () => {
+const getGames = () => {
   axios
-    .post('http://localhost:18124/shop/get_by_game_name_and_genres', {
-      gameName: gameName.value,
-      genres: selectedCategories.value,
+    .get('http://localhost:18124/shop', {
+      params: {
+        gameName: gameName.value,
+        genres: selectedCategories.value.length > 0 ? selectedCategories.value : '',
+      },
+      paramsSerializer: {
+        indexes: null,
+      }
     })
     .then((response) => {
       allGames.value = response.data
@@ -48,10 +46,12 @@ const filterTrigger = () => {
     })
 }
 
-watchEffect(filterTrigger)
+watchEffect(getGames)
 </script>
 
 <template>
+<!-- eslint-disable vue/no-parsing-error -->
+
   <div class="main-panel">
     <Toast />
     <div class="main-panel__header">
@@ -82,8 +82,10 @@ watchEffect(filterTrigger)
       </aside>
 
       <div class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5">
+        <template
+        v-if="allGames.length > 0"
+        >
         <Card
-          v-if="allGames.length > 0"
           class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row"
           v-for="game in allGames"
           :key="game.gameName"
@@ -93,7 +95,7 @@ watchEffect(filterTrigger)
           @dragend="stopDragElementToBuy()"
         >
           <template #header>
-            <img class="img_catalog_class" v-bind:src="game.pictureShop" />
+            <div class="w-full aspect-square bg-cover bg-center" :style="`background-image: url(${game.pictureShop})`" />
           </template>
           <template #title>{{ game.gameName }}</template>
           <template #content>
@@ -114,7 +116,7 @@ watchEffect(filterTrigger)
             </p>
           </template>
         </Card>
-
+        </template>
         <div v-else class="text-center mt-10 text-3xl">Nothing found!</div>
       </div>
     </div>
