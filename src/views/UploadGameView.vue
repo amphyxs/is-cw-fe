@@ -1,12 +1,10 @@
 <script setup>
-import { ref, reactive, onMounted, watchEffect } from 'vue'
+import { ref, reactive } from 'vue'
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast' // Assuming you are using PrimeVue for toasts
-import { useRouter } from 'vue-router'
 import { getCurrentAccount } from '@/shared/account'
 
 const toast = useToast()
-const router = useRouter()
 
 const categories = ref([
   { name: 'Action', key: 'action' },
@@ -55,25 +53,25 @@ const resolver = ({ values }) => {
 const uploadGame = (values) => {
   axios
     .post(
-      'http://localhost:18124/dev/upload_game',
+      'http://localhost:18124/dev',
       {
         name: values.gameName.value,
         description: values.description.value,
         genres: values.category.value,
-        game_url: values.url.value,
+        gameUrl: values.url.value,
         price: values.price.value,
-        picture_cover: values.pictureCoverUrl.value,
-        picture_shop: values.pictureStoreUrl.value,
-        picture_gameplay_1: values.pictureGameplayUrl1.value,
-        picture_gameplay_2: values.pictureGameplayUrl2.value,
-        picture_gameplay_3: values.pictureGameplayUrl3.value,
+        pictureCover: values.pictureCoverUrl.value,
+        pictureShop: values.pictureStoreUrl.value,
+        pictureGameplay1: values.pictureGameplayUrl1.value,
+        pictureGameplay2: values.pictureGameplayUrl2.value,
+        pictureGameplay3: values.pictureGameplayUrl3.value,
         devLogin: getCurrentAccount().login,
-        common_item_name: values.normalItemName.value,
-        common_item_url: values.normalItemPictureUrl.value,
-        rare_item_name: values.rareItemName.value,
-        rare_item_url: values.rareItemPictureUrl.value,
-        legendary_item_name: values.legendaryItemName.value,
-        legendary_item_url: values.legendaryItemPictureUrl.value,
+        commonItemName: values.normalItemName.value,
+        commonItemUrl: values.normalItemPictureUrl.value,
+        rareItemName: values.rareItemName.value,
+        rareItemUrl: values.rareItemPictureUrl.value,
+        legendaryItemName: values.legendaryItemName.value,
+        legendaryItemUrl: values.legendaryItemPictureUrl.value,
       },
       {
         headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
@@ -87,12 +85,14 @@ const uploadGame = (values) => {
         life: 3150,
       })
     })
-    .catch(() => {
+    .catch((error) => {
       toast.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'Error while uploading game',
-        life: 3150,
+        detail: Object.entries(error.response.data)
+          .map((entry) => entry.join(': '))
+          .join('\n'),
+        life: 13150,
       })
     })
 }

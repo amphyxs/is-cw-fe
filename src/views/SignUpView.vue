@@ -147,7 +147,7 @@ const signUp = ({ email, login, password, isDev }) => {
         role,
       })
 
-      router.push('/account')
+      router.push(role === 'ROLE_DEV' ? '/store' : '/account')
     })
     .catch((error) => {
       toast.add({

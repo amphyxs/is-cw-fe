@@ -96,7 +96,7 @@ const signIn = ({ login, password }) => {
         role: response.data.roles[0],
       })
 
-      router.push('/account')
+      router.push(response.data.roles[0] === 'ROLE_DEV' ? '/store' : '/account')
     })
     .catch((response) => {
       if (response.status === 400) {
