@@ -1,39 +1,29 @@
 <script setup>
-import { ref, reactive, onMounted, watchEffect } from 'vue'
+import { ref, reactive, watchEffect } from 'vue'
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast' // Assuming you are using PrimeVue for toasts
-import { useRouter } from 'vue-router'
+import { getCurrentAccount } from '@/shared/account'
+import NoPhoto from '@/assets/no-photo.jpg'
 
 const toast = useToast()
-const router = useRouter()
 
+// eslint-disable-next-line no-unused-vars
 const newGames = reactive([]) // TODO
-
-const allGames = ref([
-  {
-    gameName: 'Test',
-    pictureShop: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
-    genres: ['Action'],
-    price: 2213.13421,
-  },
-])
+const allGames = ref([])
 const gameName = ref('')
 
-const filterTrigger = () => {
+const getGamesInLibrary = () => {
   axios
-    .post(
-      'http://localhost:18124/library/get_by_game_name_library',
-      {
-        game_name: gameName.value,
+    .get(`http://localhost:18124/library`, {
+      params: {
+        gameName: gameName.value,
       },
-      {
-        headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
-      },
-    )
-    .then((response) => {
-      this.allGames = response.data
+      headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
     })
-    .catch((error) => {
+    .then((response) => {
+      allGames.value = response.data
+    })
+    .catch(() => {
       toast.add({
         severity: 'error',
         summary: 'Error',
@@ -44,15 +34,22 @@ const filterTrigger = () => {
 }
 
 const enterGame = (game) => {
-  axios.post(
-    'http://localhost:18124/library/enter_game',
-    {
-      game_name: game,
-    },
-    {
-      headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
-    },
-  )
+  axios
+    .patch(
+      `http://localhost:18124/library/${game}`,
+      {},
+      {
+        headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
+      },
+    )
+    .catch(() => {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while saving your launch. Running offline',
+        life: 3150,
+      })
+    })
 
   toast.add({
     severity: 'info',
@@ -61,7 +58,7 @@ const enterGame = (game) => {
   })
 }
 
-watchEffect(filterTrigger)
+watchEffect(getGamesInLibrary)
 </script>
 
 <template>
@@ -82,42 +79,46 @@ watchEffect(filterTrigger)
       </aside>
 
       <div class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5">
-        <Card
-          v-if="allGames.length > 0"
-          class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row"
-          v-for="game in allGames"
-          :key="game.gameName"
-        >
-          <template #header>
-            <img class="img_catalog_class" v-bind:src="game.pictureShop" />
-          </template>
-          <template #title>{{ game.gameName }}</template>
-          <template #content>
-            <div v-if="!game.last_run_date || game.last_run_date === ''">
-              You haven't launch this game yet
-            </div>
-            <div v-else class="genre_class">Last launch: {{ game.last_run_date }}</div>
-          </template>
-          <template #footer>
-            <div class="flex gap-2">
-              <Button
-                label=""
-                icon="pi pi-undo"
-                severity="danger"
-                outlined
-                class="w-full"
-                v-tooltip.top="'Refund'"
+        <template v-if="allGames.length > 0">
+          <Card
+            class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row"
+            v-for="game in allGames"
+            :key="game.gameName"
+          >
+            <template #header>
+              <img
+                class="img_catalog_class"
+                v-bind:src="game.pictureShop ?? NoPhoto"
+                alt="Game preview"
               />
-              <Button
-                label="Launch"
-                icon="pi pi-play"
-                class="w-full"
-                @click="enterGame(game.gameName)"
-              />
-            </div>
-          </template>
-        </Card>
-
+            </template>
+            <template #title>{{ game.gameName }}</template>
+            <template #content>
+              <div v-if="!game.last_run_date || game.last_run_date === ''">
+                You haven't launch this game yet
+              </div>
+              <div v-else class="genre_class">Last launch: {{ game.last_run_date }}</div>
+            </template>
+            <template #footer>
+              <div class="flex gap-2">
+                <Button
+                  label=""
+                  icon="pi pi-undo"
+                  severity="danger"
+                  outlined
+                  class="w-full"
+                  v-tooltip.top="'Refund'"
+                />
+                <Button
+                  label="Launch"
+                  icon="pi pi-play"
+                  class="w-full"
+                  @click="enterGame(game.gameName)"
+                />
+              </div>
+            </template>
+          </Card>
+        </template>
         <div v-else class="text-center mt-10 text-3xl">Nothing found!</div>
       </div>
     </div>

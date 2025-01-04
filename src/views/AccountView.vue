@@ -4,6 +4,7 @@ import axios from 'axios'
 import { useToast } from 'primevue/usetoast' // Assuming you are using PrimeVue for toasts
 import { useRouter } from 'vue-router'
 import { getCurrentAccount } from '@/shared/account'
+import NoPhoto from '@/assets/no-photo.jpg'
 
 const toast = useToast()
 const router = useRouter()
@@ -91,7 +92,7 @@ const getLastPlayedGames = () => {
   axios
     .get(`http://localhost:18124/library/last-games/${getCurrentAccount().login}`)
     .then((response) => {
-      lastPlayedGames.value = response.data.splice(3)
+      lastPlayedGames.value = response.data
     })
     .catch(() => {
       toast.add({
@@ -300,15 +301,15 @@ onMounted(() => {
             <div v-else class="grid grid-cols-3 gap-3 max-sm:grid-cols-1">
               <Card
                 v-for="game of lastPlayedGames"
-                v-bind:key="game.name"
+                v-bind:key="game.gameName"
                 class="game-card w-full cursor-pointer"
-                @click="router.push('/game/' + game.name)"
+                @click="router.push('/game/' + game.gameName)"
               >
                 <template #header>
-                  <img :src="game.picture" :alt="game.name" />
+                  <img :src="game.shopPicture ?? NoPhoto" :alt="game.gameName" />
                 </template>
                 <template #content>
-                  <p>{{ game.name }}</p>
+                  <p>{{ game.gameName }}</p>
                 </template>
               </Card>
             </div>
