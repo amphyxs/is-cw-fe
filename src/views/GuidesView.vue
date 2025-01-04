@@ -1,65 +1,24 @@
 <script setup>
-import { ref, reactive, onMounted, watchEffect } from 'vue'
+import { ref, onMounted, watchEffect } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import axios from 'axios'
+import { getCurrentAccount } from '@/shared/account'
 
 const toast = useToast()
 
-const allGuides = ref([
-  {
-    gameName: 'Test',
-    guideText:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum',
-    userLogin: 'Action',
-    sendDate: 2213.13421,
-  },
-  {
-    gameName: 'Test',
-    guideText:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum',
-    userLogin: 'Action',
-    sendDate: 2213.13421,
-  },
-  {
-    gameName: 'Test',
-    guideText:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum',
-    userLogin: 'Action',
-    sendDate: 2213.13421,
-  },
-  {
-    gameName: 'Test',
-    guideText:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum',
-    userLogin: 'Action',
-    sendDate: 2213.13421,
-  },
-  {
-    gameName: 'Test',
-    guideText:
-      'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum',
-    userLogin: 'Action',
-    sendDate: 2213.13421,
-  },
-])
-const allGames = ref([
-  {
-    gameName: 'Test',
-    pictureShop: 'https://primefaces.org/cdn/primevue/images/card-vue.jpg',
-    genres: ['Action'],
-    price: 2213.13421,
-  },
-])
-const selectedGame = ref('')
+const allGuides = ref([])
+const allGames = ref([])
+const selectedGame = ref(null)
 const guideText = ref('')
 
-const getAllGamesByLogin = () => {
+const getAllGames = () => {
   axios
-    .get('http://localhost:18124/game/get_all_games_by_login', {
+    .get('http://localhost:18124/game', {
       headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
     })
     .then((response) => {
-      this.allGames = response.data
+      allGames.value = response.data
+      selectedGame.value = allGames.value?.length > 0 ? allGames.value[0] : null
     })
     .catch(() => {
       toast.add({
@@ -72,12 +31,20 @@ const getAllGamesByLogin = () => {
 }
 
 const getAllGuidesBySelectedGame = () => {
+  if (!selectedGame.value?.name) {
+    return
+  }
+
+  console.log(selectedGame.value?.name)
+
   axios
-    .post('http://localhost:18124/guide/get_guides_by_selected_game', {
-      selected_game_to_show: selectedGame.value,
+    .get('http://localhost:18124/guide', {
+      params: {
+        selectedGame: selectedGame.value.name,
+      },
     })
     .then((response) => {
-      this.allGuides = response.data
+      allGuides.value = response.data
     })
     .catch(() => {
       toast.add({
@@ -92,17 +59,16 @@ const getAllGuidesBySelectedGame = () => {
 const submitGuide = () => {
   axios
     .post(
-      'http://localhost:18124/guide/add_guide',
+      'http://localhost:18124/guide',
       {
-        game_name: selectedGame.value.gameName,
-        guide_text: guideText.value,
+        gameName: selectedGame.value.name,
+        guideText: guideText.value,
       },
       {
         headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
       },
     )
-    .then((response) => {
-      this.allGuides = response.data
+    .then(() => {
       toast.add({
         severity: 'success',
         summary: 'Published',
@@ -110,6 +76,7 @@ const submitGuide = () => {
         life: 3150,
       })
       guideText.value = ''
+      getAllGuidesBySelectedGame()
     })
     .catch(() => {
       toast.add({
@@ -124,7 +91,7 @@ const submitGuide = () => {
 watchEffect(getAllGuidesBySelectedGame)
 
 onMounted(() => {
-  getAllGamesByLogin()
+  getAllGames()
 })
 </script>
 
@@ -148,13 +115,7 @@ onMounted(() => {
           >
             <template #option="slotProps">
               <div class="flex items-center">
-                <img
-                  :alt="slotProps.option.gameName"
-                  :src="slotProps.option.pictureShop"
-                  class="flag mr-2"
-                  style="width: 18px"
-                />
-                <div>{{ slotProps.option.gameName }}</div>
+                <div>{{ slotProps.option.name }}</div>
               </div>
             </template>
           </Listbox>
@@ -165,43 +126,48 @@ onMounted(() => {
         <div v-if="selectedGame && selectedGame !== ''">
           <p>Write your guide</p>
           <Textarea v-model="guideText" rows="5" fluid="true" />
-          <Button type="button" severity="secondary" label="Submit" @click="submitGuide()" />
+          <Button
+            :disabled="guideText.length === 0"
+            type="button"
+            severity="secondary"
+            label="Submit"
+            @click="submitGuide()"
+          />
         </div>
 
-        <Card
-          v-if="allGuides.length > 0"
-          class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row"
-          v-for="(guide, index) in allGuides"
-          :key="index"
-        >
-          <template #content>
-            <Inplace>
-              <template #display>{{ guide.guideText.substr(0, 100) }}</template>
-              <template #content>
-                <p class="m-0">
-                  {{ guide.guideText }}
-                </p>
-              </template>
-            </Inplace>
-          </template>
-          <template #footer>
-            <div class="flex gap-4 mt-1 max-sm:flex-col">
-              <span class="flex gap-3 items-center">
-                <i class="pi pi-user"></i>
-                <p>{{ guide.userLogin }}</p>
-              </span>
-              <span class="flex gap-3 items-center">
-                <i class="pi pi-calendar"></i>
-                <p>{{ guide.sendDate }}</p>
-              </span>
-              <span class="flex gap-3 items-center">
-                <i class="pi pi-play"></i>
-                <p>{{ guide.gameName }}</p>
-              </span>
-            </div>
-          </template>
-        </Card>
-
+        <template v-if="allGuides.length > 0">
+          <Card class="flex flex-row" v-for="(guide, index) in allGuides" :key="index">
+            <template #content>
+              <Inplace>
+                <template #display>{{ guide.guideText.substr(0, 100) }}</template>
+                <template #content>
+                  <p class="m-0">
+                    {{ guide.guideText }}
+                  </p>
+                </template>
+              </Inplace>
+            </template>
+            <template #footer>
+              <div class="flex gap-4 mt-1 max-sm:flex-col">
+                <span class="flex gap-3 items-center">
+                  <i class="pi pi-user"></i>
+                  <p>{{ guide.userLogin }}</p>
+                </span>
+                <span class="flex gap-3 items-center">
+                  <i class="pi pi-calendar"></i>
+                  <p>{{ guide.sendDate }}</p>
+                </span>
+                <span class="flex gap-3 items-center">
+                  <i class="pi pi-play"></i>
+                  <p>{{ guide.gameName }}</p>
+                </span>
+              </div>
+            </template>
+          </Card>
+        </template>
+        <div v-else-if="!selectedGame" class="text-center mt-10 text-3xl">
+          Select game to show guides
+        </div>
         <div v-else class="text-center mt-10 text-3xl">Nothing found!</div>
       </div>
     </div>

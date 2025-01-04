@@ -3,9 +3,8 @@
 
 @layer components {
   .main-panel {
-    @apply m-10 p-10 rounded-3xl;
+    @apply m-10 p-10 rounded-3xl bg-primary-900;
     min-height: 75vh;
-    background-color: rgb(0, 62, 46);
   }
 
   .main-panel__header i {
