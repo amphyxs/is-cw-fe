@@ -94,6 +94,12 @@ const router = createRouter({
       beforeEnter: loggedInGuard,
       props: true,
     },
+    {
+      path: '/dev/upload-game',
+      name: 'upload-game',
+      component: () => import('../views/UploadGameView.vue'),
+      beforeEnter: loggedInAndHasRoleGuard('ROLE_DEV'),
+    },
   ],
 })
 

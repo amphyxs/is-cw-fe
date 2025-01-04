@@ -1,6 +1,6 @@
 <script setup>
 import { RouterView, useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import Dock from 'primevue/dock'
 import StoreIcon from './assets/store.svg'
 import GameIcon from './assets/game.svg'
@@ -9,10 +9,12 @@ import ExchangeIcon from './assets/exchange.svg'
 import ProfileIcon from './assets/profile.svg'
 import CartIcon from './assets/cart.svg'
 import GuideIcon from './assets/book.svg'
+import UploadGameIcon from './assets/upload-game.svg'
 import { isDraggingElementToBuy } from '@/shared/buy-elemets'
 import { isLoggedIn } from '@/shared/account'
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast'
+import { getCurrentAccount } from '@/shared/account'
 
 const toast = useToast()
 const router = useRouter()
@@ -27,6 +29,7 @@ const items = ref([
     label: 'Library',
     icon: GameIcon,
     link: '/library',
+    roleNeeded: 'ROLE_USER',
   },
   {
     label: 'About us',
@@ -37,23 +40,37 @@ const items = ref([
     label: 'Trading',
     icon: ExchangeIcon,
     link: '/trading',
+    roleNeeded: 'ROLE_USER',
   },
   {
     label: 'Guides',
     icon: GuideIcon,
     link: '/guides',
+    roleNeeded: 'ROLE_USER',
   },
   {
     label: 'Profile',
     icon: ProfileIcon,
     link: '/account',
+    roleNeeded: 'ROLE_USER',
+  },
+  {
+    label: 'Upload game',
+    icon: UploadGameIcon,
+    roleNeeded: 'ROLE_DEV',
+    link: '/dev/upload-game',
   },
   {
     label: 'Cart',
     icon: CartIcon,
     isCart: true,
+    roleNeeded: 'ROLE_USER',
   },
 ])
+
+const availableItems = computed(() =>
+  items.value.filter((item) => !item.roleNeeded || getCurrentAccount().role === item.roleNeeded),
+)
 
 const buyGame = (game) => {
   axios
@@ -173,7 +190,7 @@ const onDropElementToBuy = (evt) => {
 <template>
   <RouterView />
 
-  <Dock v-if="isLoggedIn()" :model="items" :position="'bottom'" class="nav">
+  <Dock v-if="isLoggedIn()" :model="availableItems" :position="'bottom'" class="nav">
     <template #itemicon="{ item }">
       <img
         class="cursor-pointer"
