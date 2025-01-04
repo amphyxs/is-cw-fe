@@ -87,6 +87,13 @@ const router = createRouter({
       name: 'sign-up',
       component: () => import('../views/SignUpView.vue'),
     },
+    {
+      path: '/game/:gameName',
+      name: 'game',
+      component: () => import('../views/GameView.vue'),
+      beforeEnter: loggedInGuard,
+      props: true,
+    },
   ],
 })
 

@@ -121,17 +121,19 @@ const onFormSubmit = (e) => {
   }
 
   signUp({
+    email: e.states.email.value,
     login: e.states.login.value,
     password: e.states.password.value,
     isDev: e.states.isDev.value,
   })
 }
 
-const signUp = ({ login, password, isDev }) => {
+const signUp = ({ email, login, password, isDev }) => {
   const role = isDev ? 'ROLE_DEV' : 'ROLE_USER'
 
   axios
     .post('http://localhost:18124/auth/sign-up', {
+      email,
       login,
       password,
       role,
