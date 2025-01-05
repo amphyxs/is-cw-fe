@@ -1,4 +1,6 @@
 import { ref, computed, watchEffect } from 'vue'
+import { currentAccount } from '@/shared/account'
+import axios from 'axios'
 import Router from '@/router'
 
 const tutorialStageData = [
@@ -81,12 +83,19 @@ export const nextTutorialStage = () => {
 }
 
 const checkTutorialCompleted = () => {
-  return false // TODO
+  return !!currentAccount.value.isTutorialCompleted
 }
 
-const markTutorialAsCompleted = () => {
+const markTutorialAsCompleted = async () => {
   popoverRef.value.hide()
 
+  await axios.patch('http://localhost:18124/user/is-tutorial-completed', true, {
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: 'Bearer ' + currentAccount.value.token,
+    },
+  })
+  localStorage.setItem('isTutorialCompleted', true)
+
   location.reload()
-  return // TODO
 }
