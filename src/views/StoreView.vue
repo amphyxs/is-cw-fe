@@ -4,6 +4,7 @@ import axios from 'axios'
 import { useToast } from 'primevue/usetoast' // Assuming you are using PrimeVue for toasts
 import { useRouter } from 'vue-router'
 import { startDragElementToBuy, stopDragElementToBuy } from '@/shared/buy-elements'
+import { onEvent } from '@/shared/tutorial'
 
 const toast = useToast()
 const router = useRouter()
@@ -31,7 +32,7 @@ const getGames = () => {
       },
       paramsSerializer: {
         indexes: null,
-      }
+      },
     })
     .then((response) => {
       allGames.value = response.data
@@ -50,8 +51,6 @@ watchEffect(getGames)
 </script>
 
 <template>
-<!-- eslint-disable vue/no-parsing-error -->
-
   <div class="main-panel">
     <Toast />
     <div class="main-panel__header">
@@ -82,40 +81,41 @@ watchEffect(getGames)
       </aside>
 
       <div class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5">
-        <template
-        v-if="allGames.length > 0"
-        >
-        <Card
-          class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row"
-          v-for="game in allGames"
-          :key="game.gameName"
-          @click="router.push('/game/' + game.gameName)"
-          draggable="true"
-          @dragstart="startDragElementToBuy($event, game, 'game')"
-          @dragend="stopDragElementToBuy()"
-        >
-          <template #header>
-            <div class="w-full aspect-square bg-cover bg-center" :style="`background-image: url(${game.pictureShop})`" />
-          </template>
-          <template #title>{{ game.gameName }}</template>
-          <template #content>
-            <p class="m-0">
-              <div class="catalog_item_name">
-                <div class="catalog_item_name_genre">
-                  <div class="genre_class">{{ game.genres.join(', ') }}</div>
+        <template v-if="allGames.length > 0">
+          <Card
+            class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row"
+            v-for="(game, index) in allGames"
+            :key="game.gameName"
+            @click="router.push('/game/' + game.gameName)"
+            draggable="true"
+            @dragstart="startDragElementToBuy($event, game, 'game')"
+            @dragend="stopDragElementToBuy()"
+          >
+            <template #header>
+              <div
+                class="w-full aspect-square bg-cover bg-center"
+                :style="`background-image: url(${game.pictureShop})`"
+              />
+            </template>
+            <template #title>{{ game.gameName }}</template>
+            <template #content>
+              <div class="m-0" :id="index === 1 && 'tutorial-1'" @tutorialEvent="onEvent($event)">
+                <div class="catalog_item_name">
+                  <div class="catalog_item_name_genre">
+                    <div class="genre_class">{{ game.genres.join(', ') }}</div>
+                  </div>
+                </div>
+
+                <div class="catalog_item_price">
+                  <span v-if="game.price > 0" class="catalog_item_price_span">
+                    {{ game.price.toFixed(2) }}$
+                  </span>
+
+                  <span v-else class="catalog_item_price_span">FREE</span>
                 </div>
               </div>
-
-              <div class="catalog_item_price">
-                <span v-if="game.price > 0" class="catalog_item_price_span">
-                  {{ game.price.toFixed(2) }}$
-                </span>
-
-                <span v-else class="catalog_item_price_span">FREE</span>
-              </div>
-            </p>
-          </template>
-        </Card>
+            </template>
+          </Card>
         </template>
         <div v-else class="text-center mt-10 text-3xl">Nothing found!</div>
       </div>
@@ -123,5 +123,4 @@ watchEffect(getGames)
   </div>
 </template>
 
-<style>
-</style>
+<style></style>

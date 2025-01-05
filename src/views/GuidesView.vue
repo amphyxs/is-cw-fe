@@ -3,6 +3,7 @@ import { ref, onMounted, watchEffect } from 'vue'
 import { useToast } from 'primevue/usetoast'
 import axios from 'axios'
 import { getCurrentAccount } from '@/shared/account'
+import { onEvent } from '@/shared/tutorial'
 
 const toast = useToast()
 
@@ -96,7 +97,10 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="main-panel">
+  <div class="main-panel"
+  @tutorialEvent="onEvent($event)"
+          :id="'tutorial-5'"
+  >
     <Toast />
     <div class="main-panel__header">
       <i class="pi pi-book"></i>
@@ -123,7 +127,9 @@ onMounted(() => {
       </aside>
 
       <div class="w-full mt-5 grid-cols-1 grid gap-5">
-        <div v-if="selectedGame && selectedGame !== ''">
+        <div
+          v-if="selectedGame && selectedGame !== ''"
+        >
           <p>Write your guide</p>
           <Textarea v-model="guideText" rows="5" fluid="true" />
           <Button

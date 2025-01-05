@@ -4,6 +4,7 @@ import axios from 'axios'
 import { useToast } from 'primevue/usetoast' // Assuming you are using PrimeVue for toasts
 import { getCurrentAccount } from '@/shared/account'
 import NoPhoto from '@/assets/no-photo.jpg'
+import { onEvent, isInTutorialMode } from '@/shared/tutorial'
 
 const toast = useToast()
 
@@ -13,6 +14,17 @@ const allGames = ref([])
 const gameName = ref('')
 
 const getGamesInLibrary = () => {
+  if (isInTutorialMode.value) {
+    allGames.value = [
+      {
+        gameName: 'Test',
+        isForTutorial: true,
+      },
+    ]
+
+    return
+  }
+
   axios
     .get(`http://localhost:18124/library`, {
       params: {
@@ -99,7 +111,11 @@ watchEffect(getGamesInLibrary)
               <div v-else class="genre_class">Last launch: {{ game.last_run_date }}</div>
             </template>
             <template #footer>
-              <div class="flex gap-2">
+              <div
+                class="flex gap-2"
+                @tutorialEvent="onEvent($event)"
+                :id="game.isForTutorial && 'tutorial-3'"
+              >
                 <Button
                   label=""
                   icon="pi pi-undo"
@@ -118,13 +134,10 @@ watchEffect(getGamesInLibrary)
             </template>
           </Card>
         </template>
-        <div v-else class="text-center mt-10 text-3xl">Nothing found!</div>
+        <div v-else class="text-center mt-10 text-3xl col-span-3">Nothing found!</div>
       </div>
     </div>
   </div>
 </template>
 
-<style>
-.filters {
-}
-</style>
+<style></style>

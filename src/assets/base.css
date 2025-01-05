@@ -87,3 +87,8 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+.tutorial-viewing {
+  z-index: 1000 !important;
+  position: relative !important;
+}

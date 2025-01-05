@@ -4,6 +4,7 @@ import axios from 'axios'
 import { useToast } from 'primevue/usetoast' // Assuming you are using PrimeVue for toasts
 import { useRouter } from 'vue-router'
 import { getCurrentAccount, signOut } from '@/shared/account'
+import { onEvent, isInTutorialMode } from '@/shared/tutorial'
 import NoPhoto from '@/assets/no-photo.jpg'
 
 const toast = useToast()
@@ -89,6 +90,22 @@ const getGamesCount = () => {
 }
 
 const getLastPlayedGames = () => {
+  if (isInTutorialMode.value) {
+    lastPlayedGames.value = [
+      {
+        gameName: 'Dotka',
+      },
+      {
+        gameName: 'Cska',
+      },
+      {
+        gameName: 'Minecruft',
+      },
+    ]
+
+    return
+  }
+
   axios
     .get(`http://localhost:18124/library/last-games/${getCurrentAccount().login}`)
     .then((response) => {
@@ -123,6 +140,27 @@ const getBalanceAmount = () => {
 }
 
 const getInvenotoryItems = () => {
+  if (isInTutorialMode.value) {
+    inventoryItems.value = [
+      {
+        itemName: 'Dotka',
+        itemPicture:
+          'https://static.wikia.nocookie.net/31574e74-6558-4149-9b0e-963aa476dc64/scale-to-width/755',
+        isForTutorial: true,
+      },
+      {
+        itemName: 'Cska',
+        itemPicture: 'https://i.pinimg.com/736x/e2/42/bf/e242bf9e40998fdb18154168d0795804.jpg',
+      },
+      {
+        itemName: 'Minecruft',
+        itemPicture: 'https://i.redd.it/mdpn1df7kkk91.jpg',
+      },
+    ]
+
+    return
+  }
+
   axios
     .get('http://localhost:18124/inventory', {
       headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
@@ -275,16 +313,18 @@ onMounted(() => {
               label="Add money"
               @click="isAddingMoney = true"
             />
-            <Button
-              class="w-full item-sell-zone"
-              type="button"
-              :disabled="!isDraggingInventoryItem"
-              :severity="isDraggingInventoryItem ? 'primary' : 'secondary'"
-              label="Drop item here to sell"
-              @drop="isSellingItem = true"
-              @dragover.prevent
-              @dragenter.prevent
-            />
+            <div @tutorialEvent="onEvent($event)" :id="'tutorial-7'">
+              <Button
+                class="w-full item-sell-zone"
+                type="button"
+                :disabled="!isDraggingInventoryItem"
+                :severity="isDraggingInventoryItem ? 'primary' : 'secondary'"
+                label="Drop item here to sell"
+                @drop="isSellingItem = true"
+                @dragover.prevent
+                @dragenter.prevent
+              />
+            </div>
           </template>
         </Card>
       </aside>
@@ -343,6 +383,8 @@ onMounted(() => {
                 draggable="true"
                 @dragstart="startDragInventoryItem($event, item)"
                 @dragend="isDraggingInventoryItem = false"
+                @tutorialEvent="onEvent($event)"
+                :id="item.isForTutorial && 'tutorial-6'"
               />
             </div>
           </template>

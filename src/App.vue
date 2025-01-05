@@ -1,6 +1,6 @@
 <script setup>
 import { RouterView, useRouter } from 'vue-router'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import Dock from 'primevue/dock'
 import StoreIcon from './assets/store.svg'
 import GameIcon from './assets/game.svg'
@@ -12,6 +12,14 @@ import GuideIcon from './assets/book.svg'
 import UploadGameIcon from './assets/upload-game.svg'
 import { isDraggingElementToBuy } from '@/shared/buy-elements'
 import { isLoggedIn, currentAccount } from '@/shared/account'
+import {
+  popoverRef,
+  tutorialText,
+  nextTutorialStage,
+  startTutorialIfNotCompleted,
+  isInTutorialMode,
+  onEvent,
+} from '@/shared/tutorial'
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast'
 
@@ -184,14 +192,29 @@ const onDropElementToBuy = (evt) => {
       break
   }
 }
+
+onMounted(() => {
+  setTimeout(() => startTutorialIfNotCompleted(), 2000)
+})
 </script>
 
 <template>
+  <div
+    v-if="isInTutorialMode"
+    class="z-50 bg-gray-950 opacity-50 w-[100vw] h-[100vh] fixed top-0"
+  ></div>
+  <Popover ref="popoverRef" :dismissable="false" class="max-w-64">
+    <p>{{ tutorialText }}</p>
+    <Button label="Got it" @click="nextTutorialStage()" />
+  </Popover>
+
   <RouterView />
 
   <Dock v-if="isLoggedIn" :model="availableItems" :position="'bottom'" class="nav">
     <template #itemicon="{ item }">
       <img
+        :id="item.isCart && 'tutorial-2'"
+        @tutorialEvent="onEvent($event)"
         class="cursor-pointer"
         :class="item.isCart && !isDraggingElementToBuy && 'opacity-25'"
         @click="!item.isCart && router.push(item.link)"
