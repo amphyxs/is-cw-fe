@@ -202,11 +202,13 @@ const sellPickedInventoryItem = () => {
         life: 3150,
       })
     })
-    .catch(() => {
+    .catch((error) => {
       toast.add({
         severity: 'error',
         summary: 'Error',
-        detail: 'Error while publishing your item on trading floor',
+        detail: Object.entries(error.response.data)
+          .map((entry) => entry.join(': '))
+          .join('\n'),
         life: 3150,
       })
     })
@@ -383,7 +385,7 @@ onMounted(() => {
             </div>
           </template>
           <template #content>
-            <p class="text-xl mb-10">{{ balance }}$</p>
+            <p class="text-xl mb-10">{{ balance.toFixed(2) }}$</p>
             <Button
               class="w-full mb-3"
               type="button"

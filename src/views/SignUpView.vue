@@ -148,7 +148,38 @@ const signUp = ({ email, login, password, isDev }) => {
         isTutorialCompleted: false,
       })
 
-      router.push(role === 'ROLE_DEV' ? '/store' : '/account')
+      axios
+        .post('http://localhost:18124/auth/sign-in', {
+          login,
+          password,
+        })
+        .then((response) => {
+          storeCurrentAccount({
+            token: response.data.jwt,
+            login: response.data.login,
+            role: response.data.roles[0],
+            isTutorialCompleted: JSON.parse(response.data.isTutorialCompleted),
+          })
+
+          router.push(response.data.roles[0] === 'ROLE_DEV' ? '/store' : '/account')
+        })
+        .catch((response) => {
+          if (response.status === 400) {
+            toast.add({
+              severity: 'error',
+              summary: 'Wrong credentials',
+              detail: 'Login or password is wrong',
+              life: 3150,
+            })
+          } else {
+            toast.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Error while signing in',
+              life: 3150,
+            })
+          }
+        })
     })
     .catch((error) => {
       toast.add({

@@ -105,10 +105,12 @@ watchEffect(getGamesInLibrary)
             </template>
             <template #title>{{ game.gameName }}</template>
             <template #content>
-              <div v-if="!game.last_run_date || game.last_run_date === ''">
+              <div v-if="!game.lastRunDate || game.lastRunDate === ''">
                 You haven't launched this game yet
               </div>
-              <div v-else class="genre_class">Last launch: {{ game.last_run_date }}</div>
+              <div v-else class="genre_class">
+                Last launch: {{ game.lastRunDate.split(' ')[0] }}
+              </div>
             </template>
             <template #footer>
               <div
@@ -116,14 +118,6 @@ watchEffect(getGamesInLibrary)
                 @tutorialEvent="onEvent($event)"
                 :id="game.isForTutorial && 'tutorial-3'"
               >
-                <Button
-                  label=""
-                  icon="pi pi-undo"
-                  severity="danger"
-                  outlined
-                  class="w-full"
-                  v-tooltip.top="'Refund'"
-                />
                 <Button
                   label="Launch"
                   icon="pi pi-play"
@@ -141,31 +135,9 @@ watchEffect(getGamesInLibrary)
 </template>
 
 <style scoped>
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Define the transition itself */
-.card-enter-active {
-  animation: fadeInUp 0.5s ease-out;
-}
-
 /* Optional hover and click styles if needed */
 .card-hover:hover {
-  transform: scale(1.05);
-  transition: transform 0.3s;
+  transition: box-shadow 0.3s;
   box-shadow: 0 10px 20px rgba(102, 0, 142, 0.529);
-}
-
-.card-click:active {
-  transform: scale(0.95);
-  transition: transform 0.1s;
 }
 </style>

@@ -83,6 +83,8 @@ export const nextTutorialStage = () => {
 }
 
 const checkTutorialCompleted = () => {
+  console.log(currentAccount.value.isTutorialCompleted)
+
   return !!currentAccount.value.isTutorialCompleted
 }
 

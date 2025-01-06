@@ -27,7 +27,7 @@ const loggedInAndHasRoleGuard = (role) => {
 }
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory('/~s367527/'),
   routes: [
     {
       path: '/',
