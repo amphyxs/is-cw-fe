@@ -2,13 +2,11 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast' // Assuming you are using PrimeVue for toasts
-import { useRouter } from 'vue-router'
-import { getCurrentAccount, signOut } from '@/shared/account'
+import { currentAccount, getCurrentAccount, signOut } from '@/shared/account'
 import { onEvent, isInTutorialMode } from '@/shared/tutorial'
 import NoPhoto from '@/assets/no-photo.jpg'
 
 const toast = useToast()
-const router = useRouter()
 
 const gamesCount = ref(0)
 const lastLoginDate = ref('')
@@ -22,6 +20,8 @@ const isDraggingInventoryItem = ref(false)
 const isSellingItem = ref(false)
 const inventoryItems = ref([])
 const lastPlayedGames = ref([])
+const userActivityPosts = ref([])
+const newPostText = ref('')
 
 const addMoneyOnBalance = () => {
   isAddingMoney.value = false
@@ -239,12 +239,65 @@ const enterGame = (game) => {
   })
 }
 
+const getUserActivityPosts = () => {
+  axios
+    .get('http://localhost:18124/activity', {
+      params: {
+        login: currentAccount.value.login,
+      },
+      headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
+    })
+    .then((response) => {
+      userActivityPosts.value = response.data
+    })
+    .catch(() => {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while getting user activity posts',
+        life: 3150,
+      })
+    })
+}
+
+const submitUserActivityPost = () => {
+  axios
+    .post(
+      'http://localhost:18124/activity',
+      {
+        text: newPostText.value,
+      },
+      {
+        headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
+      },
+    )
+    .then(() => {
+      toast.add({
+        severity: 'success',
+        summary: 'Posted',
+        detail: 'New post was successfully added to your activity!',
+        life: 3150,
+      })
+      getUserActivityPosts()
+      newPostText.value = ''
+    })
+    .catch(() => {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while getting user activity posts',
+        life: 3150,
+      })
+    })
+}
+
 onMounted(() => {
   getAccountInfo()
   getLastPlayedGames()
   getGamesCount()
   getBalanceAmount()
   getInvenotoryItems()
+  getUserActivityPosts()
 })
 </script>
 
@@ -422,6 +475,57 @@ onMounted(() => {
             </div>
           </template>
         </Card>
+
+        <Card class="w-full">
+          <template #header>
+            <div class="flex items-center gap-3 p-3">
+              <i class="pi pi-book"></i>
+              <h2 class="text-2xl">Your activity</h2>
+            </div>
+          </template>
+          <template #content>
+            <p class="text-center" v-if="!userActivityPosts || userActivityPosts.length === 0">
+              Start writing posts
+            </p>
+            <div class="flex gap-3 flex-wrap">
+              <Card
+                class="flex flex-row card-enter-active card-hover game-card w-full"
+                v-for="(post, index) in userActivityPosts"
+                :key="index"
+              >
+                <template #content>
+                  <Inplace>
+                    <template #display>{{ post.text.substr(0, 100) }}</template>
+                    <template #content>
+                      <p class="m-0">
+                        {{ post.text }}
+                      </p>
+                    </template>
+                  </Inplace>
+                </template>
+                <template #footer>
+                  <div class="flex gap-4 mt-1 max-sm:flex-col">
+                    <span class="flex gap-3 items-center">
+                      <i class="pi pi-calendar"></i>
+                      <p>{{ post.sendDate }}</p>
+                    </span>
+                  </div>
+                </template>
+              </Card>
+            </div>
+          </template>
+          <template #footer>
+            <p>New post</p>
+            <Textarea v-model="newPostText" rows="5" fluid="true" />
+            <Button
+              :disabled="newPostText.length === 0"
+              type="button"
+              severity="secondary"
+              label="Submit"
+              @click="submitUserActivityPost()"
+            />
+          </template>
+        </Card>
       </div>
     </div>
   </div>
@@ -429,7 +533,7 @@ onMounted(() => {
 
 <style>
 .game-card {
-  @apply bg-primary-800;
+  @apply bg-primary-800 !important;
 }
 
 @keyframes fadeInUp {
