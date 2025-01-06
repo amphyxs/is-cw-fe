@@ -90,7 +90,7 @@ const getGamesCount = () => {
 }
 
 const getLastPlayedGames = () => {
-  if (true) {
+  if (isInTutorialMode.value) {
     lastPlayedGames.value = [
       {
         gameName: 'Dotka',
@@ -140,7 +140,7 @@ const getBalanceAmount = () => {
 }
 
 const getInvenotoryItems = () => {
-  if (true) {
+  if (isInTutorialMode.value) {
     inventoryItems.value = [
       {
         itemName: 'Dotka',

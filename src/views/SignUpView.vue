@@ -145,6 +145,7 @@ const signUp = ({ email, login, password, isDev }) => {
         token: response.data.jwt,
         login: response.data.login,
         role,
+        isTutorialCompleted: false,
       })
 
       router.push(role === 'ROLE_DEV' ? '/store' : '/account')

@@ -94,7 +94,7 @@ const signIn = ({ login, password }) => {
         token: response.data.jwt,
         login: response.data.login,
         role: response.data.roles[0],
-        isTutorialCompleted: !!response.data.isTutorialCompleted,
+        isTutorialCompleted: JSON.parse(response.data.isTutorialCompleted),
       })
 
       router.push(response.data.roles[0] === 'ROLE_DEV' ? '/store' : '/account')

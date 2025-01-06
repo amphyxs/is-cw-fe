@@ -4,7 +4,7 @@ export const currentAccount = ref({
   token: localStorage.getItem('token'),
   login: localStorage.getItem('login'),
   role: localStorage.getItem('role'),
-  isTutorialCompleted: localStorage.getItem('isTutorialCompleted'),
+  isTutorialCompleted: JSON.parse(localStorage.getItem('isTutorialCompleted')) ?? true,
 })
 
 // TODO: remove this
