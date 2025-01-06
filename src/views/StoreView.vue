@@ -63,7 +63,7 @@ watchEffect(getGames)
           <InputGroupAddon>
             <i class="pi pi-search"></i>
           </InputGroupAddon>
-          <InputText v-model="gameName" placeholder="Search" />
+          <InputText v-model="gameName" placeholder="Search" class="input-focus" />
         </InputGroup>
 
         <div class="mt-5">
@@ -80,10 +80,10 @@ watchEffect(getGames)
         </div>
       </aside>
 
-      <div class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5">
+      <div class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5 xl:grid-cols-5">
         <template v-if="allGames.length > 0">
           <Card
-            class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row"
+            class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row card-hover card-click card-enter-active"
             v-for="(game, index) in allGames"
             :key="game.gameName"
             @click="router.push('/game/' + game.gameName)"
@@ -123,4 +123,53 @@ watchEffect(getGames)
   </div>
 </template>
 
-<style></style>
+<style scoped>
+/* Simple fade-in animation for entering the page */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.main-panel {
+  animation: fadeIn 1s ease-in;
+}
+
+.card-hover:hover {
+  transform: scale(1.05);
+  transition: transform 0.3s;
+  box-shadow: 0 10px 20px rgba(141, 0, 250, 0.372);
+}
+
+.card-click:active {
+  transform: scale(0.95);
+  transition: transform 0.1s;
+}
+
+.input-focus:focus {
+  border-color: teal;
+  box-shadow: 0 0 10px rgba(0, 128, 128, 0.5);
+  transition:
+    border-color 0.3s,
+    box-shadow 0.3s;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Define the transition itself */
+.card-enter-active {
+  animation: fadeInUp 0.5s ease-out;
+}
+</style>

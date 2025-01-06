@@ -97,10 +97,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="main-panel"
-  @tutorialEvent="onEvent($event)"
-          :id="'tutorial-5'"
-  >
+  <div class="main-panel" @tutorialEvent="onEvent($event)" :id="'tutorial-5'">
     <Toast />
     <div class="main-panel__header">
       <i class="pi pi-book"></i>
@@ -127,9 +124,7 @@ onMounted(() => {
       </aside>
 
       <div class="w-full mt-5 grid-cols-1 grid gap-5">
-        <div
-          v-if="selectedGame && selectedGame !== ''"
-        >
+        <div v-if="selectedGame && selectedGame !== ''">
           <p>Write your guide</p>
           <Textarea v-model="guideText" rows="5" fluid="true" />
           <Button
@@ -142,7 +137,11 @@ onMounted(() => {
         </div>
 
         <template v-if="allGuides.length > 0">
-          <Card class="flex flex-row" v-for="(guide, index) in allGuides" :key="index">
+          <Card
+            class="flex flex-row card-enter-active card-hover"
+            v-for="(guide, index) in allGuides"
+            :key="index"
+          >
             <template #content>
               <Inplace>
                 <template #display>{{ guide.guideText.substr(0, 100) }}</template>
@@ -180,4 +179,15 @@ onMounted(() => {
   </div>
 </template>
 
-<style></style>
+<style scoped>
+/* Optional hover and click styles if needed */
+.card-hover:hover {
+  transition: box-shadow 0.3s;
+  box-shadow: 0 10px 20px rgba(102, 0, 142, 0.529);
+}
+
+.card-click:active {
+  transform: scale(0.95);
+  transition: transform 0.1s;
+}
+</style>

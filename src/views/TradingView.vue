@@ -109,10 +109,10 @@ watchEffect(getMarketItems)
         </div>
       </aside>
 
-      <div class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5">
+      <div class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5 xl:grid-cols-4">
         <template v-if="itemsOnSale.length > 0">
           <Card
-            class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row"
+            class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row card-enter-active card-hover card-click"
             v-for="item in itemsOnSale"
             :key="item.itemName"
             draggable="true"
@@ -137,7 +137,8 @@ watchEffect(getMarketItems)
             <template #content>
               <p class="text-primary-200">from {{ item.gameName }}</p>
 
-              <div class="m-0"
+              <div
+                class="m-0"
                 @tutorialEvent="onEvent($event)"
                 :id="item.isForTutorial && 'tutorial-4'"
               >
@@ -157,4 +158,32 @@ watchEffect(getMarketItems)
   </div>
 </template>
 
-<style></style>
+<style scoped>
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Define the transition itself */
+.card-enter-active {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* Optional hover and click styles if needed */
+.card-hover:hover {
+  transform: scale(1.05);
+  transition: transform 0.3s;
+  box-shadow: 0 10px 20px rgba(102, 0, 142, 0.529);
+}
+
+.card-click:active {
+  transform: scale(0.95);
+  transition: transform 0.1s;
+}
+</style>

@@ -90,10 +90,10 @@ watchEffect(getGamesInLibrary)
         </InputGroup>
       </aside>
 
-      <div class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5">
+      <div class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5 xl:grid-cols-5">
         <template v-if="allGames.length > 0">
           <Card
-            class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row"
+            class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row card-hover card-click card-enter-active"
             v-for="game in allGames"
             :key="game.gameName"
           >
@@ -106,7 +106,7 @@ watchEffect(getGamesInLibrary)
             <template #title>{{ game.gameName }}</template>
             <template #content>
               <div v-if="!game.last_run_date || game.last_run_date === ''">
-                You haven't launch this game yet
+                You haven't launched this game yet
               </div>
               <div v-else class="genre_class">Last launch: {{ game.last_run_date }}</div>
             </template>
@@ -140,4 +140,32 @@ watchEffect(getGamesInLibrary)
   </div>
 </template>
 
-<style></style>
+<style scoped>
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Define the transition itself */
+.card-enter-active {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* Optional hover and click styles if needed */
+.card-hover:hover {
+  transform: scale(1.05);
+  transition: transform 0.3s;
+  box-shadow: 0 10px 20px rgba(102, 0, 142, 0.529);
+}
+
+.card-click:active {
+  transform: scale(0.95);
+  transition: transform 0.1s;
+}
+</style>

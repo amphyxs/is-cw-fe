@@ -90,7 +90,7 @@ const getGamesCount = () => {
 }
 
 const getLastPlayedGames = () => {
-  if (isInTutorialMode.value) {
+  if (true) {
     lastPlayedGames.value = [
       {
         gameName: 'Dotka',
@@ -140,7 +140,7 @@ const getBalanceAmount = () => {
 }
 
 const getInvenotoryItems = () => {
-  if (isInTutorialMode.value) {
+  if (true) {
     inventoryItems.value = [
       {
         itemName: 'Dotka',
@@ -212,6 +212,31 @@ const sellPickedInventoryItem = () => {
     })
 
   getInvenotoryItems()
+}
+
+const enterGame = (game) => {
+  axios
+    .patch(
+      `http://localhost:18124/library/${game}`,
+      {},
+      {
+        headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
+      },
+    )
+    .catch(() => {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while saving your launch. Running offline',
+        life: 3150,
+      })
+    })
+
+  toast.add({
+    severity: 'info',
+    summary: 'Launching',
+    life: 3150,
+  })
 }
 
 onMounted(() => {
@@ -345,8 +370,7 @@ onMounted(() => {
               <Card
                 v-for="game of lastPlayedGames"
                 v-bind:key="game.gameName"
-                class="game-card w-full cursor-pointer"
-                @click="router.push('/game/' + game.gameName)"
+                class="game-card w-full cursor-pointer card-enter-active card-click card-hover"
               >
                 <template #header>
                   <div
@@ -356,6 +380,15 @@ onMounted(() => {
                 </template>
                 <template #content>
                   <p>{{ game.gameName }}</p>
+                </template>
+                <template #footer>
+                  <Button
+                    label="Launch"
+                    icon="pi pi-play"
+                    class="w-full"
+                    severity="secondary"
+                    @click="enterGame(game.gameName)"
+                  />
                 </template>
               </Card>
             </div>
@@ -379,7 +412,7 @@ onMounted(() => {
                 :alt="item.itemName"
                 v-for="item of inventoryItems"
                 v-bind:key="item.itemName"
-                class="cursor-pointer w-36 h-36"
+                class="cursor-pointer w-36 h-36 card-enter-active card-click card-hover"
                 draggable="true"
                 @dragstart="startDragInventoryItem($event, item)"
                 @dragend="isDraggingInventoryItem = false"
@@ -397,5 +430,33 @@ onMounted(() => {
 <style>
 .game-card {
   @apply bg-primary-800;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Define the transition itself */
+.card-enter-active {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+/* Optional hover and click styles if needed */
+.card-hover:hover {
+  transform: scale(1.05);
+  transition: transform 0.3s;
+  box-shadow: 0 10px 20px rgba(102, 0, 142, 0.529);
+}
+
+.card-click:active {
+  transform: scale(0.95);
+  transition: transform 0.1s;
 }
 </style>
