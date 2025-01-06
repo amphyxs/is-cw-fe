@@ -76,6 +76,7 @@ import { useToast } from 'primevue/usetoast'
 import MainBannerImage from '@/assets/main-page-banner.jpg'
 import axios from 'axios'
 import { storeCurrentAccount } from '@/shared/account'
+import { startTutorialIfNotCompleted } from '@/shared/tutorial'
 import { useRouter } from 'vue-router'
 
 const toast = useToast()
@@ -161,7 +162,9 @@ const signUp = ({ email, login, password, isDev }) => {
             isTutorialCompleted: JSON.parse(response.data.isTutorialCompleted),
           })
 
-          router.push(response.data.roles[0] === 'ROLE_DEV' ? '/store' : '/account')
+          router.push(response.data.roles[0] === 'ROLE_DEV' ? '/store' : '/account').then(() => {
+            setTimeout(() => startTutorialIfNotCompleted(), 2000)
+          })
         })
         .catch((response) => {
           if (response.status === 400) {

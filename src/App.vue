@@ -1,6 +1,6 @@
 <script setup>
 import { RouterView, useRouter } from 'vue-router'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import Dock from 'primevue/dock'
 import StoreIcon from './assets/store.svg'
 import GameIcon from './assets/game.svg'
@@ -16,7 +16,6 @@ import {
   popoverRef,
   tutorialText,
   nextTutorialStage,
-  startTutorialIfNotCompleted,
   isInTutorialMode,
   onEvent,
 } from '@/shared/tutorial'
@@ -192,10 +191,6 @@ const onDropElementToBuy = (evt) => {
       break
   }
 }
-
-onMounted(() => {
-  setTimeout(() => startTutorialIfNotCompleted(), 2000)
-})
 </script>
 
 <template>
