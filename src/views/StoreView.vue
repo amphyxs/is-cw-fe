@@ -124,20 +124,6 @@ watchEffect(getGames)
 </template>
 
 <style scoped>
-/* Simple fade-in animation for entering the page */
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.main-panel {
-  animation: fadeIn 1s ease-in;
-}
-
 .card-hover:hover {
   transform: scale(1.05);
   transition: transform 0.3s;

@@ -31,6 +31,7 @@ declare module 'vue' {
     Panel: typeof import('primevue/panel')['default']
     Password: typeof import('primevue/password')['default']
     Popover: typeof import('primevue/popover')['default']
+    Rating: typeof import('primevue/rating')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     Skeleton: typeof import('primevue/skeleton')['default']
