@@ -63,7 +63,7 @@ export const tutorialText = computed(() =>
 export const isInTutorialMode = computed(() => tutorialStage.value !== null)
 
 export const startTutorialIfNotCompleted = () => {
-  if (checkTutorialCompleted()) {
+  if (checkTutorialCompleted() && currentAccount.value.role !== 'ROLE_DEV') {
     return
   }
 
