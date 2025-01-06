@@ -2,8 +2,32 @@
 @import 'primeicons/primeicons.css';
 
 @layer components {
+  @keyframes gradientAnimationMainPanel {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  body {
+    @apply bg-gradient-to-br;
+    background-image: linear-gradient(
+      to bottom right,
+      var(--primary-color, #3b3a3a),
+      var(--primary-dark-color, #150432)
+    ) !important;
+  }
+
   .main-panel {
-    @apply m-10 p-10 rounded-3xl bg-primary-900;
+    @apply m-10 p-10 rounded-3xl bg-gradient-to-br;
+    background: linear-gradient(45deg, #079848, #07988e, #544dd2);
+    background-size: 400% 400%;
+    animation: gradientAnimationMainPanel 5s ease infinite;
     min-height: 75vh;
   }
 
