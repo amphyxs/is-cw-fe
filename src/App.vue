@@ -70,7 +70,9 @@ const items = ref([
 ])
 
 const availableItems = computed(() =>
-  items.value.filter((item) => !item.roleNeeded || currentAccount.value.roles.includes(item.roleNeeded)),
+  items.value.filter(
+    (item) => !item.roleNeeded || currentAccount.value.roles.includes(item.roleNeeded),
+  ),
 )
 
 const buyGame = (game) => {

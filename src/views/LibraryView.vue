@@ -70,6 +70,40 @@ const enterGame = (game) => {
   })
 }
 
+const refundGame = (game) => {
+  axios
+    .post(
+      `http://localhost:18124/library/refund`,
+      {},
+      {
+        params: {
+          gameName: game,
+        },
+        headers: {
+          Authorization: 'Bearer ' + getCurrentAccount().token,
+        },
+      },
+    )
+    .then(() => {
+      toast.add({
+        severity: 'success',
+        summary: 'Done',
+        detail: 'The game was refunded. Money is on your balance',
+        life: 3150,
+      })
+
+      getGamesInLibrary()
+    })
+    .catch(() => {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while refunding the game',
+        life: 3150,
+      })
+    })
+}
+
 watchEffect(getGamesInLibrary)
 </script>
 
@@ -118,6 +152,15 @@ watchEffect(getGamesInLibrary)
                 @tutorialEvent="onEvent($event)"
                 :id="game.isForTutorial && 'tutorial-3'"
               >
+                <Button
+                  label=""
+                  icon="pi pi-undo"
+                  severity="danger"
+                  outlined
+                  class="w-full"
+                  v-tooltip.top="'Refund'"
+                  @click="refundGame(game.gameName)"
+                />
                 <Button
                   label="Launch"
                   icon="pi pi-play"
