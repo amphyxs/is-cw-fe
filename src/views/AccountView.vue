@@ -166,7 +166,7 @@ const getInvenotoryItems = () => {
       headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
     })
     .then((response) => {
-      inventoryItems.value = response.data
+      inventoryItems.value = response.data.filter((item) => item.amount > 0)
     })
     .catch(() => {
       toast.add({
@@ -201,6 +201,8 @@ const sellPickedInventoryItem = () => {
         detail: 'Your items was published on trading floor!',
         life: 3150,
       })
+
+      getInvenotoryItems()
     })
     .catch((error) => {
       toast.add({
@@ -306,15 +308,17 @@ onMounted(() => {
 <template>
   <Dialog v-model:visible="isSellingItem" modal header="Sell item" :style="{ width: '25rem' }">
     <div class="flex-auto">
-      <label for="price-for-item" class="font-bold block mb-2">Price you want to get</label>
+      <label for="price-for-item" class="font-bold block mb-2"
+        >Price you want to get for <strong>1 item</strong></label
+      >
       <InputNumber
         v-model="priceForSellingItem"
         inputId="price-for-item"
         mode="currency"
         currency="USD"
         locale="en-US"
-        :min="0"
-        :max="1000000"
+        :min="1"
+        :max="500"
         fluid
       />
     </div>
@@ -462,18 +466,21 @@ onMounted(() => {
               Inventory is empty
             </p>
             <div class="flex gap-3 flex-wrap">
-              <img
-                :src="item.itemPicture"
-                :alt="item.itemName"
-                v-for="item of inventoryItems"
-                v-bind:key="item.itemName"
-                class="cursor-pointer w-36 h-36 card-enter-active card-click card-hover"
-                draggable="true"
-                @dragstart="startDragInventoryItem($event, item)"
-                @dragend="isDraggingInventoryItem = false"
-                @tutorialEvent="onEvent($event)"
-                :id="item.isForTutorial && 'tutorial-6'"
-              />
+              <template v-for="item of inventoryItems" v-bind:key="item.itemName">
+                <OverlayBadge :value="item.amount">
+                  <img
+                    :src="item.itemPicture"
+                    :alt="item.itemName"
+                    v-bind:key="item.itemName"
+                    class="cursor-pointer w-36 h-36 card-enter-active card-click card-hover"
+                    draggable="true"
+                    @dragstart="startDragInventoryItem($event, item)"
+                    @dragend="isDraggingInventoryItem = false"
+                    @tutorialEvent="onEvent($event)"
+                    :id="item.isForTutorial && 'tutorial-6'"
+                  />
+                </OverlayBadge>
+              </template>
             </div>
           </template>
         </Card>

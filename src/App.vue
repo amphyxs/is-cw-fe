@@ -168,7 +168,7 @@ const buyItem = (item) => {
         toast.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Error while buying item',
+          detail: error.response.data.message,
           life: 3150,
         })
       }
