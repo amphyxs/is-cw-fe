@@ -12,6 +12,7 @@ const gamesCount = ref(0)
 const lastLoginDate = ref('')
 const registrationDate = ref('')
 const balance = ref(0)
+const bonuses = ref(0)
 const moneyToAdd = ref(0)
 const priceForSellingItem = ref(0)
 const itemForSale = ref(null)
@@ -128,6 +129,7 @@ const getBalanceAmount = () => {
     })
     .then((response) => {
       balance.value = response.data.balance
+      bonuses.value = response.data.bonuses
     })
     .catch(() => {
       toast.add({
@@ -389,7 +391,14 @@ onMounted(() => {
             </div>
           </template>
           <template #content>
-            <p class="text-xl mb-10">{{ balance.toFixed(2) }}$</p>
+            <div class="mb-10 flex gap-2 items-center">
+              <p class="text-xl">{{ balance.toFixed(2) }}$</p>
+              <Chip
+                :label="bonuses.toFixed(2)"
+                icon="pi pi-plus"
+                style="background-color: blueviolet"
+              />
+            </div>
             <Button
               class="w-full mb-3"
               type="button"

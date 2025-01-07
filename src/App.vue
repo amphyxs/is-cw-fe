@@ -1,6 +1,6 @@
 <script setup>
 import { RouterView, useRouter } from 'vue-router'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, watchEffect } from 'vue'
 import Dock from 'primevue/dock'
 import StoreIcon from './assets/store.svg'
 import GameIcon from './assets/game.svg'
@@ -21,7 +21,9 @@ import {
 } from '@/shared/tutorial'
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast'
+import { useConfirm } from 'primevue/useconfirm'
 
+const confirm = useConfirm()
 const toast = useToast()
 const router = useRouter()
 
@@ -68,7 +70,8 @@ const items = ref([
     isCart: true,
   },
 ])
-
+const bonuses = ref(0)
+const isUsingBonusesToBuyGame = ref(false)
 const availableItems = computed(() =>
   items.value.filter(
     (item) => !item.roleNeeded || currentAccount.value.roles.includes(item.roleNeeded),
@@ -81,6 +84,7 @@ const buyGame = (game) => {
       'http://localhost:18124/game',
       {
         gameName: game.gameName,
+        useBonuses: isUsingBonusesToBuyGame.value,
       },
       {
         headers: { Authorization: 'Bearer ' + currentAccount.value.token },
@@ -93,6 +97,8 @@ const buyGame = (game) => {
         detail: 'This game was added into your library',
         life: 3150,
       })
+
+      getBonuses()
 
       router.push('/library')
     })
@@ -115,7 +121,7 @@ const buyGame = (game) => {
         toast.add({
           severity: 'error',
           summary: 'Error',
-          detail: 'Error while buying game',
+          detail: error.response.data.message,
           life: 3150,
         })
       }
@@ -178,7 +184,8 @@ const onDropElementToBuy = (evt) => {
 
   switch (elementType) {
     case 'game':
-      buyGame(element)
+      showPurchaseConfirmation(element)
+      setTimeout(() => document.getElementById('confirm').click(), 1)
       break
     case 'gameItem':
       buyItem(element)
@@ -187,6 +194,48 @@ const onDropElementToBuy = (evt) => {
       console.error(`Unknow element type to buy: ${elementType}`)
       break
   }
+}
+
+const getBonuses = () => {
+  axios
+    .get('http://localhost:18124/user/balance', {
+      headers: { Authorization: 'Bearer ' + currentAccount.value.token },
+    })
+    .then((response) => {
+      bonuses.value = response.data.bonuses
+    })
+    .catch(() => {
+      toast.add({
+        severity: 'error',
+        summary: 'Error',
+        detail: 'Error while getting bonuses',
+        life: 3150,
+      })
+    })
+}
+
+const showPurchaseConfirmation = (game) => {
+  getBonuses()
+
+  confirm.require({
+    target: document.getElementById('tutorial-2'),
+    group: 'templating',
+    message: 'Please confirm to proceed moving forward.',
+    icon: 'pi pi-exclamation-circle',
+    rejectProps: {
+      icon: 'pi pi-times',
+      label: 'Cancel',
+      outlined: true,
+    },
+    acceptProps: {
+      icon: 'pi pi-check',
+      label: 'Confirm',
+    },
+    accept: () => {
+      buyGame(game)
+    },
+    reject: () => {},
+  })
 }
 </script>
 
@@ -199,6 +248,26 @@ const onDropElementToBuy = (evt) => {
     <p>{{ tutorialText }}</p>
     <Button label="Got it" @click="nextTutorialStage()" />
   </Popover>
+  <ConfirmPopup group="templating">
+    <template #message="slotProps">
+      <div
+        id="confirm"
+        class="flex flex-col items-center w-full gap-4 border-b border-surface-200 dark:border-surface-700 p-4 mb-4 pb-0"
+      >
+        <i :class="slotProps.message.icon" class="text-6xl text-primary-500"></i>
+        <p>{{ slotProps.message.message }}</p>
+        <div class="flex gap-2 items-center mb-5">
+          <Chip
+            :label="bonuses.toFixed(2)"
+            icon="pi pi-plus"
+            style="background-color: blueviolet"
+          />
+          <p>Use bonuses</p>
+          <ToggleSwitch v-model="isUsingBonusesToBuyGame" />
+        </div>
+      </div>
+    </template>
+  </ConfirmPopup>
 
   <RouterView />
 
