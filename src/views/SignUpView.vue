@@ -139,7 +139,7 @@ const signUp = ({ email, login, password, isDev }) => {
       email,
       login,
       password,
-      isDev,
+      isDev: role === 'ROLE_DEV',
     })
     .then((response) => {
       storeCurrentAccount({
