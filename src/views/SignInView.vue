@@ -94,12 +94,12 @@ const signIn = ({ login, password }) => {
       storeCurrentAccount({
         token: response.data.jwt,
         login: response.data.login,
-        role: response.data.roles[0],
+        roles: response.data.roles,
         isTutorialCompleted: JSON.parse(response.data.isTutorialCompleted),
       })
 
-      router.push(response.data.roles[0] === 'ROLE_DEV' ? '/store' : '/account').then(() => {
-        setTimeout(() => startTutorialIfNotCompleted(), 2000)
+      router.push('/account').then(() => {
+        setTimeout(() => startTutorialIfNotCompleted(), 100)
       })
     })
     .catch((response) => {

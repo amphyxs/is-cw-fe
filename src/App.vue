@@ -35,7 +35,6 @@ const items = ref([
     label: 'Library',
     icon: GameIcon,
     link: '/library',
-    roleNeeded: 'ROLE_USER',
   },
   {
     label: 'About us',
@@ -46,19 +45,16 @@ const items = ref([
     label: 'Trading',
     icon: ExchangeIcon,
     link: '/trading',
-    roleNeeded: 'ROLE_USER',
   },
   {
     label: 'Guides',
     icon: GuideIcon,
     link: '/guides',
-    roleNeeded: 'ROLE_USER',
   },
   {
     label: 'Profile',
     icon: ProfileIcon,
     link: '/account',
-    roleNeeded: 'ROLE_USER',
   },
   {
     label: 'Upload game',
@@ -70,12 +66,11 @@ const items = ref([
     label: 'Cart',
     icon: CartIcon,
     isCart: true,
-    roleNeeded: 'ROLE_USER',
   },
 ])
 
 const availableItems = computed(() =>
-  items.value.filter((item) => !item.roleNeeded || currentAccount.value.role === item.roleNeeded),
+  items.value.filter((item) => !item.roleNeeded || currentAccount.value.roles.includes(item.roleNeeded)),
 )
 
 const buyGame = (game) => {

@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 export const currentAccount = ref({
   token: localStorage.getItem('token'),
   login: localStorage.getItem('login'),
-  role: localStorage.getItem('role'),
+  roles: localStorage.getItem('roles') ?? [],
   isTutorialCompleted: JSON.parse(localStorage.getItem('isTutorialCompleted')) ?? true,
 })
 
@@ -12,14 +12,14 @@ export const getCurrentAccount = () => {
   return currentAccount.value
 }
 
-export const storeCurrentAccount = ({ token, login, role, isTutorialCompleted }) => {
-  if (token && login && role) {
+export const storeCurrentAccount = ({ token, login, roles, isTutorialCompleted }) => {
+  if (token && login && roles) {
     localStorage.setItem('token', token)
     localStorage.setItem('login', login)
-    localStorage.setItem('role', role)
+    localStorage.setItem('roles', roles)
     localStorage.setItem('isTutorialCompleted', isTutorialCompleted)
 
-    currentAccount.value = { token, login, role, isTutorialCompleted }
+    currentAccount.value = { token, login, roles, isTutorialCompleted }
   }
 }
 
@@ -31,7 +31,7 @@ export const isLoggedIn = computed(() => {
 export const signOut = () => {
   localStorage.removeItem('token')
   localStorage.removeItem('login')
-  localStorage.removeItem('role')
+  localStorage.removeItem('roles')
   localStorage.removeItem('isTutorialCompleted')
   currentAccount.value = null
   location.reload()

@@ -15,7 +15,7 @@ const loggedInGuard = (_, __, next) => {
 
 const loggedInAndHasRoleGuard = (role) => {
   return (_, __, next) => {
-    if (isLoggedIn.value && getCurrentAccount().role === role) {
+    if (isLoggedIn.value && getCurrentAccount().roles.includes(role)) {
       next()
       return
     }
@@ -99,6 +99,11 @@ const router = createRouter({
       name: 'upload-game',
       component: () => import('../views/UploadGameView.vue'),
       beforeEnter: loggedInAndHasRoleGuard('ROLE_DEV'),
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'npt-found-page',
+      redirect: '/account',
     },
   ],
 })
