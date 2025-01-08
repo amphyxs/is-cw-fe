@@ -25,7 +25,7 @@ const categories = ref([
 
 const getGames = () => {
   axios
-    .get('http://localhost:18124/shop', {
+    .get('http://localhost:18125/shop', {
       params: {
         gameName: gameName.value,
         genres: selectedCategories.value.length > 0 ? selectedCategories.value : '',

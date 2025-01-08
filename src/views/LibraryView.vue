@@ -26,7 +26,7 @@ const getGamesInLibrary = () => {
   }
 
   axios
-    .get(`http://localhost:18124/library`, {
+    .get(`http://localhost:18125/library`, {
       params: {
         gameName: gameName.value,
       },
@@ -48,7 +48,7 @@ const getGamesInLibrary = () => {
 const enterGame = (game) => {
   axios
     .patch(
-      `http://localhost:18124/library/${game}`,
+      `http://localhost:18125/library/${game}`,
       {},
       {
         headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
@@ -73,7 +73,7 @@ const enterGame = (game) => {
 const refundGame = (game) => {
   axios
     .post(
-      `http://localhost:18124/library/refund`,
+      `http://localhost:18125/library/refund`,
       {},
       {
         params: {

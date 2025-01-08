@@ -81,7 +81,7 @@ const availableItems = computed(() =>
 const buyGame = (game) => {
   axios
     .post(
-      'http://localhost:18124/game',
+      'http://localhost:18125/game',
       {
         gameName: game.gameName,
         useBonuses: isUsingBonusesToBuyGame.value,
@@ -131,7 +131,7 @@ const buyGame = (game) => {
 const buyItem = (item) => {
   axios
     .post(
-      'http://localhost:18124/market/buy',
+      'http://localhost:18125/market/buy',
       {
         gameName: item.gameName,
         itemName: item.itemName,
@@ -198,7 +198,7 @@ const onDropElementToBuy = (evt) => {
 
 const getBonuses = () => {
   axios
-    .get('http://localhost:18124/user/balance', {
+    .get('http://localhost:18125/user/balance', {
       headers: { Authorization: 'Bearer ' + currentAccount.value.token },
     })
     .then((response) => {

@@ -29,7 +29,7 @@ const addMoneyOnBalance = () => {
 
   axios
     .post(
-      'http://localhost:18124/user/balance-add',
+      'http://localhost:18125/user/balance-add',
       {
         balance: moneyToAdd.value,
       },
@@ -59,7 +59,7 @@ const startDragInventoryItem = (evt, item) => {
 
 const getAccountInfo = () => {
   axios
-    .get(`http://localhost:18124/user/status-dates/${getCurrentAccount().login}`)
+    .get(`http://localhost:18125/user/status-dates/${getCurrentAccount().login}`)
     .then((response) => {
       registrationDate.value = response.data.registrationDate
       lastLoginDate.value = response.data.lastLoginDate
@@ -76,7 +76,7 @@ const getAccountInfo = () => {
 
 const getGamesCount = () => {
   axios
-    .get(`http://localhost:18124/library/count/${getCurrentAccount().login}`)
+    .get(`http://localhost:18125/library/count/${getCurrentAccount().login}`)
     .then((response) => {
       gamesCount.value = response.data
     })
@@ -108,7 +108,7 @@ const getLastPlayedGames = () => {
   }
 
   axios
-    .get(`http://localhost:18124/library/last-games/${getCurrentAccount().login}`)
+    .get(`http://localhost:18125/library/last-games/${getCurrentAccount().login}`)
     .then((response) => {
       lastPlayedGames.value = response.data.slice(0, 3)
     })
@@ -124,7 +124,7 @@ const getLastPlayedGames = () => {
 
 const getBalanceAmount = () => {
   axios
-    .get('http://localhost:18124/user/balance', {
+    .get('http://localhost:18125/user/balance', {
       headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
     })
     .then((response) => {
@@ -164,7 +164,7 @@ const getInvenotoryItems = () => {
   }
 
   axios
-    .get('http://localhost:18124/inventory', {
+    .get('http://localhost:18125/inventory', {
       headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
     })
     .then((response) => {
@@ -185,7 +185,7 @@ const sellPickedInventoryItem = () => {
 
   axios
     .post(
-      'http://localhost:18124/market/sell',
+      'http://localhost:18125/market/sell',
       {
         gameName: itemForSale.value.gameName,
         itemName: itemForSale.value.itemName,
@@ -223,7 +223,7 @@ const sellPickedInventoryItem = () => {
 const enterGame = (game) => {
   axios
     .patch(
-      `http://localhost:18124/library/${game}`,
+      `http://localhost:18125/library/${game}`,
       {},
       {
         headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
@@ -247,7 +247,7 @@ const enterGame = (game) => {
 
 const getUserActivityPosts = () => {
   axios
-    .get('http://localhost:18124/activity', {
+    .get('http://localhost:18125/activity', {
       params: {
         login: currentAccount.value.login,
       },
@@ -269,7 +269,7 @@ const getUserActivityPosts = () => {
 const submitUserActivityPost = () => {
   axios
     .post(
-      'http://localhost:18124/activity',
+      'http://localhost:18125/activity',
       {
         text: newPostText.value,
       },

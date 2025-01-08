@@ -89,7 +89,7 @@ const checkTutorialCompleted = () => {
 const markTutorialAsCompleted = async () => {
   popoverRef.value.hide()
 
-  await axios.patch('http://localhost:18124/user/is-tutorial-completed', true, {
+  await axios.patch('http://localhost:18125/user/is-tutorial-completed', true, {
     headers: {
       'Content-Type': 'application/json',
       Authorization: 'Bearer ' + currentAccount.value.token,

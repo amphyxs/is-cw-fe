@@ -135,7 +135,7 @@ const signUp = ({ email, login, password, isDev }) => {
   const role = isDev ? 'ROLE_DEV' : 'ROLE_USER'
 
   axios
-    .post('http://localhost:18124/auth/sign-up', {
+    .post('http://localhost:18125/auth/sign-up', {
       email,
       login,
       password,
@@ -150,7 +150,7 @@ const signUp = ({ email, login, password, isDev }) => {
       })
 
       axios
-        .post('http://localhost:18124/auth/sign-in', {
+        .post('http://localhost:18125/auth/sign-in', {
           login,
           password,
         })

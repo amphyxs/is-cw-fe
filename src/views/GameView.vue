@@ -24,7 +24,7 @@ const hasCurrentUserReviewForThisGame = computed(() =>
 
 const getInfo = () => {
   axios
-    .get(`http://localhost:18124/game/${props.gameName}`)
+    .get(`http://localhost:18125/game/${props.gameName}`)
     .then((response) => {
       gameInfo.value = response.data
     })
@@ -47,7 +47,7 @@ const getReviewRatingFromText = (text) => {
 
 const getGameReviews = () => {
   axios
-    .get(`http://localhost:18124/review`, {
+    .get(`http://localhost:18125/review`, {
       params: {
         selectedGame: props.gameName,
       },
@@ -68,7 +68,7 @@ const getGameReviews = () => {
 const submitReview = () => {
   axios
     .post(
-      `http://localhost:18124/review`,
+      `http://localhost:18125/review`,
       {
         gameName: props.gameName,
         reviewText: `${newReviewRating.value}/5\n${newReviewText.value}`,

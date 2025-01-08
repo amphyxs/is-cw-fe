@@ -53,7 +53,7 @@ const resolver = ({ values }) => {
 const uploadGame = (values) => {
   axios
     .post(
-      'http://localhost:18124/dev',
+      'http://localhost:18125/dev',
       {
         name: values.gameName.value,
         description: values.description.value,

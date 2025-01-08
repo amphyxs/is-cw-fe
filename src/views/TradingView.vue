@@ -15,7 +15,7 @@ const itemsOnSale = ref([])
 
 const getAllGames = () => {
   axios
-    .get('http://localhost:18124/game', {
+    .get('http://localhost:18125/game', {
       headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
     })
     .then((response) => {
@@ -49,7 +49,7 @@ const getMarketItems = () => {
   }
 
   axios
-    .get('http://localhost:18124/market', {
+    .get('http://localhost:18125/market', {
       params: {
         gameName: selectedGame.value.name,
         itemName: itemName.value,

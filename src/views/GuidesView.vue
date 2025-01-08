@@ -14,7 +14,7 @@ const guideText = ref('')
 
 const getAllGames = () => {
   axios
-    .get('http://localhost:18124/game', {
+    .get('http://localhost:18125/game', {
       headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
     })
     .then((response) => {
@@ -39,7 +39,7 @@ const getAllGuidesBySelectedGame = () => {
   console.log(selectedGame.value?.name)
 
   axios
-    .get('http://localhost:18124/guide', {
+    .get('http://localhost:18125/guide', {
       params: {
         selectedGame: selectedGame.value.name,
       },
@@ -60,7 +60,7 @@ const getAllGuidesBySelectedGame = () => {
 const submitGuide = () => {
   axios
     .post(
-      'http://localhost:18124/guide',
+      'http://localhost:18125/guide',
       {
         gameName: selectedGame.value.name,
         guideText: guideText.value,
