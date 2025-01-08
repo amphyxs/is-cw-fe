@@ -13,6 +13,9 @@ const toast = useToast()
 const newGames = reactive([]) // TODO
 const allGames = ref([])
 const gameName = ref('')
+const firstGameIndex = ref(0)
+const totalGamesCount = ref(0)
+const PAGE_SIZE = 10
 
 const getGamesInLibrary = () => {
   if (isInTutorialMode.value) {
@@ -30,11 +33,14 @@ const getGamesInLibrary = () => {
     .get(`http://localhost:18125/library`, {
       params: {
         gameName: gameName.value,
+        page: firstGameIndex.value / PAGE_SIZE,
+        size: PAGE_SIZE,
       },
       headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
     })
     .then((response) => {
-      allGames.value = response.data
+      allGames.value = response.data.content
+      totalGamesCount.value = response.data.totalElements
     })
     .catch(() => {
       toast.add({
@@ -127,10 +133,9 @@ watchEffect(getGamesInLibrary)
         </InputGroup>
       </aside>
 
-      <div>
+      <div class="w-full">
         <template v-if="allGames.length > 0">
           <Paginator
-            v-if="allGames.length > 0"
             v-model:first="firstGameIndex"
             :rows="PAGE_SIZE"
             :totalRecords="totalGamesCount"

@@ -89,7 +89,6 @@ watchEffect(getGames)
       <div class="w-full">
         <template v-if="allGames.length > 0">
           <Paginator
-            v-if="allGames.length > 0"
             v-model:first="firstGameIndex"
             :rows="PAGE_SIZE"
             :totalRecords="totalGamesCount"

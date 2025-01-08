@@ -12,6 +12,9 @@ const allGames = ref([])
 const itemName = ref('')
 const selectedGame = ref(null)
 const itemsOnSale = ref([])
+const firstItemIndex = ref(0)
+const totalItemsCount = ref(0)
+const PAGE_SIZE = 10
 
 const getAllGames = () => {
   axios
@@ -53,10 +56,13 @@ const getMarketItems = () => {
       params: {
         gameName: selectedGame.value.name,
         itemName: itemName.value,
+        page: firstItemIndex.value / PAGE_SIZE,
+        size: PAGE_SIZE,
       },
     })
     .then((response) => {
-      itemsOnSale.value = response.data
+      itemsOnSale.value = response.data.content
+      totalItemsCount.value = response.data.totalElements
     })
     .catch(() => {
       toast.add({
@@ -82,7 +88,7 @@ watchEffect(getMarketItems)
       <i class="pi pi-sync"></i>
       <h1 class="text-4xl">Trading</h1>
     </div>
-    <div class="main-panel__content flex flex-row-reverse w-full gap-10 max-sm:flex-col">
+    <div class="main-panel__content flex flex-row-reverse w-full gap-10 max-sm:flex-col mt-4">
       <aside class="filters">
         <InputGroup>
           <InputGroupAddon>
@@ -109,48 +115,57 @@ watchEffect(getMarketItems)
         </div>
       </aside>
 
-      <div class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5 xl:grid-cols-4">
+      <div class="w-full">
         <template v-if="itemsOnSale.length > 0">
-          <Card
-            class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row card-enter-active card-hover card-click"
-            v-for="item in itemsOnSale"
-            :key="item.itemName"
-            draggable="true"
-            @dragstart="startDragElementToBuy($event, item, 'gameItem')"
-            @dragend="stopDragElementToBuy()"
-          >
-            <template #header>
-              <div
-                class="w-full aspect-square bg-cover bg-center"
-                :style="`background-image: url(${item.itemPicture ?? NoPhoto})`"
-              />
-            </template>
-            <template #title>
-              <div class="flex gap-3">
-                <p class="text-3xl">{{ item.itemName }}</p>
-                <Message class="w-fit" severity="error" v-if="item.rarity === 'rare'">RARE</Message>
-                <Message class="w-fit" severity="info" v-else-if="item.rarity === 'normal'"
-                  >NORMAL</Message
-                >
-              </div>
-            </template>
-            <template #content>
-              <p class="text-primary-200">from {{ item.gameName }}</p>
-
-              <div
-                class="m-0"
-                @tutorialEvent="onEvent($event)"
-                :id="item.isForTutorial && 'tutorial-4'"
-              >
-                <div class="catalog_item_price">
-                  <span v-if="item.price > 0" class="catalog_item_price_span">
-                    {{ item.price.toFixed(2) }}$
-                  </span>
-                  <span v-else class="catalog_item_price_span">FREE</span>
+          <Paginator
+            v-model:first="firstItemIndex"
+            :rows="PAGE_SIZE"
+            :totalRecords="totalItemsCount"
+          ></Paginator>
+          <div class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5 xl:grid-cols-4">
+            <Card
+              class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row card-enter-active card-hover card-click"
+              v-for="item in itemsOnSale"
+              :key="item.itemName"
+              draggable="true"
+              @dragstart="startDragElementToBuy($event, item, 'gameItem')"
+              @dragend="stopDragElementToBuy()"
+            >
+              <template #header>
+                <div
+                  class="w-full aspect-square bg-cover bg-center"
+                  :style="`background-image: url(${item.itemPicture ?? NoPhoto})`"
+                />
+              </template>
+              <template #title>
+                <div class="flex gap-3">
+                  <p class="text-3xl">{{ item.itemName }}</p>
+                  <Message class="w-fit" severity="error" v-if="item.rarity === 'rare'"
+                    >RARE</Message
+                  >
+                  <Message class="w-fit" severity="info" v-else-if="item.rarity === 'normal'"
+                    >NORMAL</Message
+                  >
                 </div>
-              </div>
-            </template>
-          </Card>
+              </template>
+              <template #content>
+                <p class="text-primary-200">from {{ item.gameName }}</p>
+
+                <div
+                  class="m-0"
+                  @tutorialEvent="onEvent($event)"
+                  :id="item.isForTutorial && 'tutorial-4'"
+                >
+                  <div class="catalog_item_price">
+                    <span v-if="item.price > 0" class="catalog_item_price_span">
+                      {{ item.price.toFixed(2) }}$
+                    </span>
+                    <span v-else class="catalog_item_price_span">FREE</span>
+                  </div>
+                </div>
+              </template>
+            </Card>
+          </div>
         </template>
         <div v-else class="text-center mt-10 text-3xl">Nothing found!</div>
       </div>
