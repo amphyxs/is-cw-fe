@@ -1,6 +1,6 @@
 <script setup>
 import { RouterView, useRouter } from 'vue-router'
-import { ref, computed, onMounted, watchEffect } from 'vue'
+import { ref, computed } from 'vue'
 import Dock from 'primevue/dock'
 import StoreIcon from './assets/store.svg'
 import GameIcon from './assets/game.svg'
