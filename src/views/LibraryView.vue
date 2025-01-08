@@ -61,6 +61,9 @@ const enterGame = (game) => {
         headers: { Authorization: 'Bearer ' + getCurrentAccount().token },
       },
     )
+    .then(() => {
+      getGamesInLibrary()
+    })
     .catch(() => {
       toast.add({
         severity: 'error',

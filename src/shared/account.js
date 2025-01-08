@@ -1,3 +1,4 @@
+import { teardownAchivements } from '@/shared/achievements'
 import { computed, ref } from 'vue'
 
 export const currentAccount = ref({
@@ -34,5 +35,6 @@ export const signOut = () => {
   localStorage.removeItem('roles')
   localStorage.removeItem('isTutorialCompleted')
   currentAccount.value = null
+  teardownAchivements()
   location.reload()
 }
