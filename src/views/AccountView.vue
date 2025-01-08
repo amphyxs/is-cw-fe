@@ -1,10 +1,11 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast' // Assuming you are using PrimeVue for toasts
 import { currentAccount, getCurrentAccount, signOut } from '@/shared/account'
 import { onEvent, isInTutorialMode } from '@/shared/tutorial'
 import NoPhoto from '@/assets/no-photo.jpg'
+import { achievements, checkAchievement, achievementData } from '@/shared/achievements'
 
 const toast = useToast()
 
@@ -23,6 +24,9 @@ const inventoryItems = ref([])
 const lastPlayedGames = ref([])
 const userActivityPosts = ref([])
 const newPostText = ref('')
+const telegramBotConnectLink = computed(() =>
+  currentAccount.value.token ? `https://t.me/ParApp_bot?start=${currentAccount.value.login}` : null,
+)
 
 const addMoneyOnBalance = () => {
   isAddingMoney.value = false
@@ -38,6 +42,7 @@ const addMoneyOnBalance = () => {
       },
     )
     .then(() => {
+      checkAchievement('Rich man', moneyToAdd.value)
       getBalanceAmount()
     })
     .catch(() => {
@@ -204,6 +209,7 @@ const sellPickedInventoryItem = () => {
         life: 3150,
       })
 
+      checkAchievement('Trader')
       getInvenotoryItems()
     })
     .catch((error) => {
@@ -379,6 +385,14 @@ onMounted(() => {
             <p>Last login date: {{ lastLoginDate }}</p>
           </template>
           <template #footer>
+            <Button
+              class="mb-3 w-full"
+              type="submit"
+              severity="secondary"
+              label="Connect to Telegram bot"
+              as="a"
+              :href="telegramBotConnectLink"
+            />
             <Button class="w-full" severity="danger" label="Sign out" @click="signOut()" />
           </template>
         </Card>
@@ -417,6 +431,34 @@ onMounted(() => {
                 @dragover.prevent
                 @dragenter.prevent
               />
+            </div>
+          </template>
+        </Card>
+
+        <Card class="w-full">
+          <template #header>
+            <div class="flex items-center gap-3 p-3">
+              <i class="pi pi-star"></i>
+              <p class="text-2xl">Achievements</p>
+            </div>
+          </template>
+          <template #content>
+            <div class="flex flex-wrap gap-3">
+              <template
+                v-for="achievement of Object.keys(achievementData)"
+                v-bind:key="achievement"
+              >
+                <div
+                  :style="
+                    achievements.includes(achievement)
+                      ? `background-image: url(${achievementData[achievement].picture})`
+                      : `background-color: black`
+                  "
+                  class="w-16 aspect-square bg-cover text-center text-3xl"
+                >
+                  {{ achievements.includes(achievement) ? '' : '?' }}
+                </div>
+              </template>
             </div>
           </template>
         </Card>

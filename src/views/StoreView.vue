@@ -22,6 +22,9 @@ const categories = ref([
   { name: 'Adventures', key: 'adventures' },
   { name: 'Sport', key: 'sport' },
 ])
+const firstGameIndex = ref(0)
+const totalGamesCount = ref(0)
+const PAGE_SIZE = 10
 
 const getGames = () => {
   axios
@@ -29,13 +32,16 @@ const getGames = () => {
       params: {
         gameName: gameName.value,
         genres: selectedCategories.value.length > 0 ? selectedCategories.value : '',
+        page: Math.floor(firstGameIndex.value / PAGE_SIZE),
+        size: PAGE_SIZE,
       },
       paramsSerializer: {
         indexes: null,
       },
     })
     .then((response) => {
-      allGames.value = response.data
+      allGames.value = response.data.content
+      totalGamesCount.value = response.data.totalElements
     })
     .catch(() => {
       toast.add({
@@ -57,7 +63,7 @@ watchEffect(getGames)
       <i class="pi pi-shop"></i>
       <h1 class="text-4xl">Store</h1>
     </div>
-    <div class="main-panel__content flex flex-row-reverse w-full gap-10 max-sm:flex-col">
+    <div class="main-panel__content flex flex-row-reverse w-full gap-10 max-sm:flex-col mt-3">
       <aside class="filters">
         <InputGroup>
           <InputGroupAddon>
@@ -80,42 +86,50 @@ watchEffect(getGames)
         </div>
       </aside>
 
-      <div class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5 xl:grid-cols-5">
+      <div class="w-full">
         <template v-if="allGames.length > 0">
-          <Card
-            class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row card-hover card-click card-enter-active"
-            v-for="(game, index) in allGames"
-            :key="game.gameName"
-            @click="router.push('/game/' + game.gameName)"
-            draggable="true"
-            @dragstart="startDragElementToBuy($event, game, 'game')"
-            @dragend="stopDragElementToBuy()"
-          >
-            <template #header>
-              <div
-                class="w-full aspect-square bg-cover bg-center"
-                :style="`background-image: url(${game.pictureShop})`"
-              />
-            </template>
-            <template #title>{{ game.gameName }}</template>
-            <template #content>
-              <div class="m-0" :id="index === 1 && 'tutorial-1'" @tutorialEvent="onEvent($event)">
-                <div class="catalog_item_name">
-                  <div class="catalog_item_name_genre">
-                    <div class="genre_class">{{ game.genres.join(', ') }}</div>
+          <Paginator
+            v-if="allGames.length > 0"
+            v-model:first="firstGameIndex"
+            :rows="PAGE_SIZE"
+            :totalRecords="totalGamesCount"
+          ></Paginator>
+          <div class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5 xl:grid-cols-5">
+            <Card
+              class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row card-hover card-click card-enter-active"
+              v-for="(game, index) in allGames"
+              :key="game.gameName"
+              @click="router.push('/game/' + game.gameName)"
+              draggable="true"
+              @dragstart="startDragElementToBuy($event, game, 'game')"
+              @dragend="stopDragElementToBuy()"
+            >
+              <template #header>
+                <div
+                  class="w-full aspect-square bg-cover bg-center"
+                  :style="`background-image: url(${game.pictureShop})`"
+                />
+              </template>
+              <template #title>{{ game.gameName }}</template>
+              <template #content>
+                <div class="m-0" :id="index === 1 && 'tutorial-1'" @tutorialEvent="onEvent($event)">
+                  <div class="catalog_item_name">
+                    <div class="catalog_item_name_genre">
+                      <div class="genre_class">{{ game.genres.join(', ') }}</div>
+                    </div>
+                  </div>
+
+                  <div class="catalog_item_price">
+                    <span v-if="game.price > 0" class="catalog_item_price_span">
+                      {{ game.price.toFixed(2) }}$
+                    </span>
+
+                    <span v-else class="catalog_item_price_span">FREE</span>
                   </div>
                 </div>
-
-                <div class="catalog_item_price">
-                  <span v-if="game.price > 0" class="catalog_item_price_span">
-                    {{ game.price.toFixed(2) }}$
-                  </span>
-
-                  <span v-else class="catalog_item_price_span">FREE</span>
-                </div>
-              </div>
-            </template>
-          </Card>
+              </template>
+            </Card>
+          </div>
         </template>
         <div v-else class="text-center mt-10 text-3xl">Nothing found!</div>
       </div>

@@ -1,6 +1,6 @@
 <script setup>
 import { RouterView, useRouter } from 'vue-router'
-import { ref, computed } from 'vue'
+import { ref, computed, watchEffect } from 'vue'
 import Dock from 'primevue/dock'
 import StoreIcon from './assets/store.svg'
 import GameIcon from './assets/game.svg'
@@ -22,6 +22,7 @@ import {
 import axios from 'axios'
 import { useToast } from 'primevue/usetoast'
 import { useConfirm } from 'primevue/useconfirm'
+import { getAllAchievements, newAchievemtToNotifyUser } from '@/shared/achievements'
 
 const confirm = useConfirm()
 const toast = useToast()
@@ -237,6 +238,21 @@ const showPurchaseConfirmation = (game) => {
     reject: () => {},
   })
 }
+
+watchEffect(getAllAchievements)
+
+watchEffect(() => {
+  if (newAchievemtToNotifyUser.value) {
+    toast.add({
+      severity: 'contrast',
+      summary: 'New achievement',
+      detail: `You've got an achievement: ${newAchievemtToNotifyUser.value}!`,
+      life: 3150,
+    })
+
+    newAchievemtToNotifyUser.value = null
+  }
+})
 </script>
 
 <template>

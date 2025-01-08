@@ -72,12 +72,6 @@ const router = createRouter({
       beforeEnter: loggedInGuard,
     },
     {
-      path: '/cart',
-      name: 'cart',
-      component: () => import('../views/CartView.vue'),
-      beforeEnter: loggedInGuard,
-    },
-    {
       path: '/sign-in',
       name: 'sign-in',
       component: () => import('../views/SignInView.vue'),

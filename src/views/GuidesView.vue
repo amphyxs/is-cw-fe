@@ -7,10 +7,13 @@ import { onEvent } from '@/shared/tutorial'
 
 const toast = useToast()
 
+const PAGE_SIZE = 10
 const allGuides = ref([])
 const allGames = ref([])
 const selectedGame = ref(null)
 const guideText = ref('')
+const firstGuideIndex = ref(0)
+const totalGuidesCount = ref(0)
 
 const getAllGames = () => {
   axios
@@ -36,16 +39,17 @@ const getAllGuidesBySelectedGame = () => {
     return
   }
 
-  console.log(selectedGame.value?.name)
-
   axios
     .get('http://localhost:18125/guide', {
       params: {
         selectedGame: selectedGame.value.name,
+        page: Math.floor(firstGuideIndex.value / PAGE_SIZE),
+        size: PAGE_SIZE,
       },
     })
     .then((response) => {
-      allGuides.value = response.data
+      allGuides.value = response.data.content
+      totalGuidesCount.value = response.data.totalElements
     })
     .catch(() => {
       toast.add({
@@ -137,6 +141,12 @@ onMounted(() => {
         </div>
 
         <template v-if="allGuides.length > 0">
+          <Paginator
+            v-model:first="firstGuideIndex"
+            :rows="PAGE_SIZE"
+            :totalRecords="totalGuidesCount"
+          ></Paginator>
+
           <Card
             class="flex flex-row card-enter-active card-hover"
             v-for="(guide, index) in allGuides"

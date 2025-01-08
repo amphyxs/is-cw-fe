@@ -5,6 +5,7 @@ import { useToast } from 'primevue/usetoast' // Assuming you are using PrimeVue 
 import { getCurrentAccount } from '@/shared/account'
 import NoPhoto from '@/assets/no-photo.jpg'
 import { onEvent, isInTutorialMode } from '@/shared/tutorial'
+import { checkAchievement } from '@/shared/achievements'
 
 const toast = useToast()
 
@@ -63,6 +64,8 @@ const enterGame = (game) => {
       })
     })
 
+  checkAchievement('Hard gamer')
+
   toast.add({
     severity: 'info',
     summary: 'Launching',
@@ -114,7 +117,7 @@ watchEffect(getGamesInLibrary)
       <i class="pi pi-bars"></i>
       <h1 class="text-4xl">Library</h1>
     </div>
-    <div class="main-panel__content flex flex-row-reverse w-full gap-10 max-sm:flex-col">
+    <div class="main-panel__content flex flex-row-reverse w-full gap-10 max-sm:flex-col mt-5">
       <aside class="filters">
         <InputGroup>
           <InputGroupAddon>
@@ -124,54 +127,63 @@ watchEffect(getGamesInLibrary)
         </InputGroup>
       </aside>
 
-      <div class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5 xl:grid-cols-5">
+      <div>
         <template v-if="allGames.length > 0">
-          <Card
-            class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row card-hover card-click card-enter-active"
-            v-for="game in allGames"
-            :key="game.gameName"
-          >
-            <template #header>
-              <div
-                class="w-full aspect-square bg-cover bg-center"
-                :style="`background-image: url(${game.pictureShop ?? NoPhoto})`"
-              />
-            </template>
-            <template #title>{{ game.gameName }}</template>
-            <template #content>
-              <div v-if="!game.lastRunDate || game.lastRunDate === ''">
-                You haven't launched this game yet
-              </div>
-              <div v-else class="genre_class">
-                Last launch: {{ game.lastRunDate.split(' ')[0] }}
-              </div>
-            </template>
-            <template #footer>
-              <div
-                class="flex gap-2"
-                @tutorialEvent="onEvent($event)"
-                :id="game.isForTutorial && 'tutorial-3'"
-              >
-                <Button
-                  label=""
-                  icon="pi pi-undo"
-                  severity="danger"
-                  outlined
-                  class="w-full"
-                  v-tooltip.top="'Refund'"
-                  @click="refundGame(game.gameName)"
+          <Paginator
+            v-if="allGames.length > 0"
+            v-model:first="firstGameIndex"
+            :rows="PAGE_SIZE"
+            :totalRecords="totalGamesCount"
+          ></Paginator>
+
+          <div class="w-full mt-5 grid-cols-1 grid lg:grid-cols-3 gap-5 xl:grid-cols-5">
+            <Card
+              class="cursor-pointer shadow-inner shadow-lg shadow-teal-500 flex flex-row card-hover card-click card-enter-active"
+              v-for="game in allGames"
+              :key="game.gameName"
+            >
+              <template #header>
+                <div
+                  class="w-full aspect-square bg-cover bg-center"
+                  :style="`background-image: url(${game.pictureShop ?? NoPhoto})`"
                 />
-                <Button
-                  label="Launch"
-                  icon="pi pi-play"
-                  class="w-full"
-                  @click="enterGame(game.gameName)"
-                />
-              </div>
-            </template>
-          </Card>
+              </template>
+              <template #title>{{ game.gameName }}</template>
+              <template #content>
+                <div v-if="!game.lastRunDate || game.lastRunDate === ''">
+                  You haven't launched this game yet
+                </div>
+                <div v-else class="genre_class">
+                  Last launch: {{ game.lastRunDate.split(' ')[0] }}
+                </div>
+              </template>
+              <template #footer>
+                <div
+                  class="flex gap-2"
+                  @tutorialEvent="onEvent($event)"
+                  :id="game.isForTutorial && 'tutorial-3'"
+                >
+                  <Button
+                    label=""
+                    icon="pi pi-undo"
+                    severity="danger"
+                    outlined
+                    class="w-full"
+                    v-tooltip.top="'Refund'"
+                    @click="refundGame(game.gameName)"
+                  />
+                  <Button
+                    label="Launch"
+                    icon="pi pi-play"
+                    class="w-full"
+                    @click="enterGame(game.gameName)"
+                  />
+                </div>
+              </template>
+            </Card>
+          </div>
         </template>
-        <div v-else class="text-center mt-10 text-3xl col-span-3">Nothing found!</div>
+        <div v-else class="text-center mt-10 text-3xl w-full">Nothing found!</div>
       </div>
     </div>
   </div>
